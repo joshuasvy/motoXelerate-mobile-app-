@@ -1,20 +1,22 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import StackNavigator from "./routes/StackNavigator";
+import { View, ActivityIndicator } from "react-native";
+import { useFonts } from "expo-font";
+import React from "react";
 
 export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
+  const [fontsLoaded] = useFonts({
+    Regular: require("./assets/fonts/Poppins-Regular.ttf"),
+    Medium: require("./assets/fonts/Poppins-Medium.ttf"),
+    SemiBold: require("./assets/fonts/Poppins-SemiBold.ttf"),
+    Bold: require("./assets/fonts/Poppins-Bold.ttf"),
+  });
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+  return <StackNavigator />;
+}
