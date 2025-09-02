@@ -10,6 +10,7 @@ import React from "react";
 
 export default function ProductBtn({
   backgroundColor,
+  btnIcon,
   width,
   onPress,
   name,
@@ -27,7 +28,7 @@ export default function ProductBtn({
           onPress={onPress}
         >
           <Image
-            source={require("../assets/Images/bag.png")}
+            source={btnIcon}
             style={styles.imageStyle}
           />
           <Text style={[fonts.subtext, { marginTop: 3, name, fontSize, color }]}>
@@ -58,6 +59,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     width: 160,
     height: 50,
+    borderWidth: 1,
   },
   imageStyle: {
     width: 23,

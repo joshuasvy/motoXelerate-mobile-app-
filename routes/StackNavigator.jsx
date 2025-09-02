@@ -14,8 +14,9 @@ import CancelOrder from "../UI/CancelOrder";
 import History from "../UI/History";
 import HistoryDetails from "../UI/HistoryDetails";
 import WriteaReview from "../UI/WriteaReview";
-import FilloutForm from "../components/FilloutForm";
 import QuantityforCartCard from "../components/QuantityforCartCard";
+import CustomModal from "../components/CustomModal";
+import VariantSelection from "../components/VariantSelection";
 import Testing from "../UI/Testing";
 
 const Stack = createNativeStackNavigator();
@@ -24,7 +25,7 @@ const StackNavigator = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Tab"
+        initialRouteName="Products"
         screenOptions={{ headerShown: false, animation: "default" }}
       >
         <Stack.Screen name="Landing" component={LandingScreen} />
@@ -43,6 +44,8 @@ const StackNavigator = () => {
         <Stack.Screen name="HistoryDetails" component={HistoryDetails} />
         <Stack.Screen name="WriteaReview" component={WriteaReview} />
         <Stack.Screen name="Quantity" component={QuantityforCartCard} />
+        <Stack.Screen name="Modal" component={CustomModal} />
+        <Stack.Screen name="Variant" component={VariantSelection} />
         <Stack.Screen name="Testing" component={Testing} />
       </Stack.Navigator>
     </NavigationContainer>

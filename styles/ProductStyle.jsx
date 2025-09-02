@@ -53,7 +53,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginVertical: 10,
+    padding: 18,
+    marginBottom: 10,
+    // borderWidth: 1,
   },
 });
 

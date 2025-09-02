@@ -5,7 +5,7 @@ export default BreakLine = () => {
     <View
       style={{
         alignSelf: "center",
-        width: "98%",
+        width: "100%",
         height: 1,
         marginVertical: 18,
         backgroundColor: "#797979",
