@@ -2,23 +2,21 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   Image,
-  TouchableOpacity,
 } from "react-native";
 import Fonts from "../constants/Fonts";
 import React from "react";
 
-export default function NormalCard() {
+export default function NormalCard({ display, name}) {
   return (
     <View style={styles.notifWrapper}>
       <Image
-        source={require("../assets/Images/testingImage.jpg")}
+        source={display}
         style={styles.productImage}
       />
       <View style={styles.infoWrapper}>
         <Text style={[Fonts.semibold, { fontSize: 16, marginTop: 10 }]}>
-          Your notification here
+          {name}
         </Text>
         <View
           style={{

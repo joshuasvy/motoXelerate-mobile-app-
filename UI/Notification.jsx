@@ -1,15 +1,19 @@
-import { View, Text, SafeAreaView, Image, ScrollView } from "react-native";
+import { View, Text, StatusBar, Image, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../styles/NotificationStyle";
-import Header from "../components/Header";
+import Header from "../components/DefaultHeader";
 import Fonts from "../constants/Fonts";
 import BreakLine from "../components/BreakLine";
 import React from "react";
 
-const Notification = () => {
+const Notification = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
+
       <Header
         backIcon={require("../assets/Images/back.png")}
+        goBack={() => navigation.goBack()}
         back={"Back"}
         title={"Notification"}
       />

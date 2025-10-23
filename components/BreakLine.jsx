@@ -1,11 +1,11 @@
 import { View } from "react-native";
 
-export default BreakLine = () => {
+const BreakLine = () => {
   return (
     <View
       style={{
         alignSelf: "center",
-        width: "100%",
+        width: "98%",
         height: 1,
         marginVertical: 18,
         backgroundColor: "#797979",
@@ -13,3 +13,5 @@ export default BreakLine = () => {
     />
   );
 };
+
+export default BreakLine;

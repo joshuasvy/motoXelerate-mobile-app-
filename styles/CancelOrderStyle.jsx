@@ -7,35 +7,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     paddingHorizontal: 15,
   },
-  backWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    margin: 8,
-    marginVertical: 10,
-  },
-  imageIcon: {
-    width: 35,
-    height: 35,
-  },
-  addressWrapper: {
-    backgroundColor: Colors.primary,
-    borderRadius: 8,
-    paddingHorizontal: 18,
-    padding: 15,
-  },
-  methodpaymentWrapper: {
-    marginTop: 5,
-  },
-  infopaymentWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 13,
-    marginTop: 10,
-  },
-  gcashlogo: {
-    width: 25,
-    height: 25,
-  },
   buttonContainer: {
     flex: 1,
     justifyContent: "flex-end",

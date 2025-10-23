@@ -2,7 +2,6 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   Image,
   Modal as RNModal,
   TouchableOpacity,
@@ -10,7 +9,7 @@ import {
 import Fonts from "../constants/Fonts";
 import React, { useState } from "react";
 
-export default function CustomModal({ visibility, onPress }) {
+export default function CustomModal({ visibility, onPress, iconModal, textModal }) {
   return (
     <RNModal visible={visibility} animationType="slide" transparent={true}>
       <View style={styles.overlay}>
@@ -22,17 +21,14 @@ export default function CustomModal({ visibility, onPress }) {
                 style={styles.modalClose}
               />
             </TouchableOpacity>
-            <Image
-              source={require("../assets/Images/icons/successful.png")}
-              style={styles.modalIcon}
-            />
+            <Image source={iconModal} style={styles.modalIcon} />
             <Text
               style={[
                 Fonts.semibold,
                 { fontSize: 18, marginTop: 25, alignSelf: "center" },
               ]}
             >
-              Successfully added to Cart
+              {textModal}
             </Text>
           </View>
         </View>
@@ -66,8 +62,8 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalClose: {
-    width: 35,
-    height: 35,
+    width: 20,
+    height: 20,
     resizeMode: "contain",
     alignSelf: "flex-end",
   },
@@ -76,5 +72,6 @@ const styles = StyleSheet.create({
     height: 110,
     resizeMode: "contain",
     alignSelf: "center",
+    marginTop: 18,
   },
 });

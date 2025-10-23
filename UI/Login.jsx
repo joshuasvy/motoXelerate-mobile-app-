@@ -2,8 +2,9 @@ import { View, Text, SafeAreaView, StatusBar } from "react-native";
 import React from "react";
 import { useState } from "react";
 import styles from "../styles/LoginStyle";
-import fonts from "../constants/Fonts";
-import HeaderPage from "../components/HeaderPage";
+import Colors from "../constants/Colors";
+import Fonts from "../constants/Fonts";
+import OutsideHeader from "../components/OutsideHeader";
 import Input from "../components/Input";
 import Button from "../components/Button";
 
@@ -13,12 +14,12 @@ const Login = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
-      <HeaderPage
+      <OutsideHeader
         name={"Sign up"}
         onPress={() => navigation.navigate("Signup")}
       />
       <View style={styles.wrapper}>
-        <Text style={[fonts.header, { marginBottom: 20 }]}>Login</Text>
+        <Text style={[Fonts.header, { marginBottom: 20 }]}>Login</Text>
         <Input
           label={"Email:"}
           placeholder={"Enter your email"}
@@ -45,10 +46,10 @@ const Login = ({ navigation }) => {
                 borderWidth: 1,
               }}
             />
-            <Text style={[fonts.regular, { fontSize: 14 }]}>Remember me</Text>
+            <Text style={[Fonts.regular, { fontSize: 14 }]}>Remember me</Text>
           </View>
           <Text
-            style={[fonts.regular, { fontSize: 14, color: colors.secondary }]}
+            style={[Fonts.regular, { fontSize: 14, color: Colors.secondary }]}
           >
             Forgot Password
           </Text>
@@ -59,7 +60,7 @@ const Login = ({ navigation }) => {
             title="Login"
             width={120}
             height={50}
-            backgroundColor={colors.primary}
+            backgroundColor={Colors.primary}
             onPress={() => navigation.navigate("Tab")}
           />
         </View>
@@ -67,7 +68,7 @@ const Login = ({ navigation }) => {
       <View style={styles.footerWrapper}>
         <Text
           style={[
-            fonts.regular,
+            Fonts.regular,
             { textAlign: "center", padding: 40, fontSize: 17 },
           ]}
         >

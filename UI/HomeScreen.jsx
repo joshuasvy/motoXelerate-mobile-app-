@@ -1,18 +1,19 @@
 import {
   View,
   Text,
-  SafeAreaView,
   StatusBar,
   Image,
   TextInput,
   TouchableOpacity,
+  FlatList,
   ScrollView,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../styles/HomeStyle";
-import fonts from "../constants/Fonts";
+import Fonts from "../constants/Fonts";
 import { useState } from "react";
-import Scrollbtn from "../components/Scrollbtn";
 import ProductCard from "../components/ProductCard";
+import products from "../data/product";
 import React from "react";
 
 const HomeScreen = ({ navigation }) => {
@@ -24,7 +25,7 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.header}>
         <View style={styles.logo} />
         <TextInput
-          style={[fonts.regular, styles.input]}
+          style={[Fonts.regular, styles.input]}
           placeholder={"Search..."}
           value={search}
           onChangeText={setSearch}
@@ -51,33 +52,10 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-      <Text style={[fonts.header, { alignSelf: "center" }]}>MOTOXELERATE</Text>
+      <Text style={[Fonts.header, { alignSelf: "center" }]}>MOTOXELERATE</Text>
       <View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{
-            flexDirection: "row",
-            alignItems: "flex-start",
-            paddingHorizontal: 15,
-            marginTop: 5,
-            marginBottom: 15,
-          }}
-        >
-          <Scrollbtn label="Recommendation" marginRight={7} />
-          <Scrollbtn label="Best Seller" marginRight={7} />
-          <Scrollbtn
-            label="Category"
-            marginRight={7}
-            imageBtn={require("../assets/Images/dropdown.png")}
-          ></Scrollbtn>
-          <Scrollbtn
-            label="Brand"
-            imageBtn={require("../assets/Images/dropdown.png")}
-          />
-        </ScrollView>
       </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <SafeAreaView style={{ flex: 1 }}>
         <View
           style={{
             marginHorizontal: 15,
@@ -88,32 +66,23 @@ const HomeScreen = ({ navigation }) => {
             marginBottom: 13,
           }}
         >
-          <ProductCard
-            productImg={require("../assets/Images/testingImage.jpg")}
-            name="Product Name"
-            price="₱ 999.99"
-            rate="4.5"
-            review="(28 reviews)"
-            onPress={() => navigation.navigate("Products")}
-          />
-          <ProductCard
-            productImg={require("../assets/Images/testingImage.jpg")}
-            name="Product Name"
-            price="₱ 999.99"
-            rate="4.5"
-            review="(28 reviews)"
-            onPress={() => navigation.navigate("Products")}
-          />
-          <ProductCard
-            productImg={require("../assets/Images/testingImage.jpg")}
-            name="Product Name"
-            price="₱ 999.99"
-            rate="4.5"
-            review="(28 reviews)"
-            onPress={() => navigation.navigate("Products")}
+          <FlatList
+            data={products}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <ProductCard
+                product={item}
+                onPress={() =>
+                  navigation.navigate("Products", { product: item })
+                }
+              />
+            )}
+            numColumns={2}
+            columnWrapperStyle={{ justifyContent: "space-between" }}
+            showsVerticalScrollIndicator={false}
           />
         </View>
-      </ScrollView>
+      </SafeAreaView>
     </SafeAreaView>
   );
 };

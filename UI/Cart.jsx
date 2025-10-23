@@ -1,42 +1,54 @@
 import {
   View,
   Text,
-  SafeAreaView,
   StatusBar,
   TouchableOpacity,
   Image,
   ScrollView,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../styles/CartStyle";
-import Header from "../components/Header";
+import DefaultHeader from "../components/DefaultHeader";
 import CartCard from "../components/CartCard";
 import ProductBtn from "../components/ProductBtn";
 import Fonts from "../constants/Fonts";
-import React from "react";
+import React, { useEffect, useState } from "react"; // ✅ fixed import
+import { useCart } from "../context/CartContext";
 
 const Cart = ({ navigation }) => {
+  const { cartItems, getSelectedTotal, removeFromCart } = useCart(); // ✅ single clean useCart call
+  const total = getSelectedTotal();
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
-      <Header
+      <DefaultHeader
         title={"My Cart"}
-        onPress={() => navigation.navigate("Notification")}
+        notifPress={() => navigation.navigate("Notification")}
         chatPress={() => console.log("Chat Pressed")}
       />
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={styles.cardWrapper}
       >
-        <CartCard onPress={() => navigation.navigate("Products")} />
-        <CartCard onPress={() => navigation.navigate("Products")} />
-        <CartCard onPress={() => navigation.navigate("Products")} />
-        <CartCard onPress={() => navigation.navigate("Products")} />
-        <CartCard onPress={() => navigation.navigate("Products")} />
+        {cartItems.map((item) => (
+          <CartCard
+            key={item.id}
+            product={item}
+            onPress={() =>
+              navigation.navigate("ProductDetails", { product: item })
+            }
+            onRemove={() => removeFromCart(item.id)}
+          />
+        ))}
       </ScrollView>
+
       <View style={styles.buttonWrapper}>
         <View style={styles.priceContainer}>
           <Text style={[Fonts.title, styles.totalPrice]}>Total Price</Text>
-          <Text style={[Fonts.semibold, styles.price]}>₱99.99</Text>
+          <Text style={[Fonts.semibold, styles.price]}>
+            ₱{total.toLocaleString()}
+          </Text>
         </View>
         <View style={styles.breakLine} />
         <ProductBtn

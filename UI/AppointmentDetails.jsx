@@ -1,14 +1,15 @@
 import {
   View,
   Text,
-  SafeAreaView,
   StatusBar,
   ScrollView,
   TouchableOpacity,
   Image,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../styles/AppointmentDetailStyle";
 import Fonts from "../constants/Fonts";
+import BreakLine from "../components/BreakLine";
 import React from "react";
 
 const AppointmentDetails = ({ navigation }) => {
@@ -50,7 +51,7 @@ const AppointmentDetails = ({ navigation }) => {
             alignItems: "center",
           }}
         >
-          <Text style={[fonts.title, { fontSize: 22 }]}>Service Name</Text>
+          <Text style={[Fonts.title, { fontSize: 22 }]}>Service Name</Text>
           <View
             style={{
               flexDirection: "row",
@@ -64,7 +65,7 @@ const AppointmentDetails = ({ navigation }) => {
             />
             <Text
               style={[
-                fonts.minitext,
+                Fonts.minitext,
                 { fontSize: 11, letterSpacing: 1, color: "#797979" },
               ]}
             >
@@ -79,18 +80,18 @@ const AppointmentDetails = ({ navigation }) => {
             alignItems: "center",
           }}
         >
-          <Text style={[fonts.semibold, { fontSize: 20 }]}>₱ 999.99</Text>
+          <Text style={[Fonts.semibold, { fontSize: 20 }]}>₱ 999.99</Text>
         </View>
-        <Text style={[fonts.subtext, { fontSize: 17, marginTop: 18 }]}>
+        <Text style={[Fonts.subtext, { fontSize: 17, marginTop: 18 }]}>
           Description
         </Text>
-        <Text style={[fonts.regular, { marginTop: 18 }]}>
+        <Text style={[Fonts.regular, { marginTop: 18 }]}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </Text>
         <BreakLine />
-        <Text style={[fonts.subtext, { fontSize: 17 }]}>Importance</Text>
-        <Text style={[fonts.regular, { marginTop: 18 }]}>
+        <Text style={[Fonts.subtext, { fontSize: 17 }]}>Importance</Text>
+        <Text style={[Fonts.regular, { marginTop: 18 }]}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </Text>
@@ -103,7 +104,7 @@ const AppointmentDetails = ({ navigation }) => {
               alignItems: "center",
             }}
           >
-            <Text style={[fonts.subtext, { fontSize: 17 }]}>Reviews</Text>
+            <Text style={[Fonts.subtext, { fontSize: 17 }]}>Reviews</Text>
             <TouchableOpacity
               activeOpacity={0.8}
               style={{
@@ -112,7 +113,7 @@ const AppointmentDetails = ({ navigation }) => {
                 alignItems: "center",
               }}
             >
-              <Text style={[fonts.minitext, { marginTop: 2 }]}>View All</Text>
+              <Text style={[Fonts.minitext, { marginTop: 2 }]}>View All</Text>
               <Image
                 source={require("../assets/Images/next.png")}
                 style={{ width: 20, height: 20, marginLeft: 5 }}
@@ -133,13 +134,13 @@ const AppointmentDetails = ({ navigation }) => {
                     flexWrap: "wrap",
                   }}
                 >
-                  <Text style={[fonts.semibold, { fontSize: 13 }]}>
+                  <Text style={[Fonts.semibold, { fontSize: 13 }]}>
                     John Doe
                   </Text>
                 </View>
                 <Text
                   style={[
-                    fonts.regular,
+                    Fonts.regular,
                     {
                       fontSize: 12,
                       maxWidth: "100%",
@@ -165,13 +166,13 @@ const AppointmentDetails = ({ navigation }) => {
                     flexWrap: "wrap",
                   }}
                 >
-                  <Text style={[fonts.semibold, { fontSize: 13 }]}>
+                  <Text style={[Fonts.semibold, { fontSize: 13 }]}>
                     John Doe
                   </Text>
                 </View>
                 <Text
                   style={[
-                    fonts.regular,
+                    Fonts.regular,
                     {
                       fontSize: 12,
                       maxWidth: "100%",
@@ -200,7 +201,7 @@ const AppointmentDetails = ({ navigation }) => {
           >
             Book Now?
           </Text>
-          <Text style={[fonts.regular, { fontSize: 13, textAlign: "center" }]}>
+          <Text style={[Fonts.regular, { fontSize: 13, textAlign: "center" }]}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
           </Text>
         </View>

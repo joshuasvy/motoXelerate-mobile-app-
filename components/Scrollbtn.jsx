@@ -1,10 +1,12 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import Colors from "../constants/Colors";
+import Fonts from "../constants/Fonts";
 import React from "react";
 
 const Scrollbtn = ({ label, marginRight, imageBtn }) => {
   return (
     <View style={[styles.contentWrapper, { marginRight }]}>
-      <Text style={[fonts.regular, { color: "#fff" }]}>{label}</Text>
+      <Text style={[Fonts.regular, { color: "#fff" }]}>{label}</Text>
       <TouchableOpacity>
         <Image
           source={imageBtn}
@@ -19,7 +21,7 @@ export default Scrollbtn;
 
 const styles = StyleSheet.create({
   contentWrapper: {
-    backgroundColor: colors.secondary,
+    backgroundColor: Colors.secondary,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",

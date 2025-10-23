@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
-import fonts from "../constants/Fonts";
+import Fonts from "../constants/Fonts";
 import Colors from "../constants/Colors";
 import React from "react";
 
@@ -13,7 +13,7 @@ export default function HistoryCard({ onPress }) {
         />
         <View style={{ gap: 60 }}>
           <View style={styles.nameNext}>
-            <Text style={[fonts.subtext, { fontSize: 17 }]}>Product Name</Text>
+            <Text style={[Fonts.subtext, { fontSize: 17 }]}>Product Name</Text>
             <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
               <Image
                 source={require("../assets/Images/next.png")}
@@ -22,13 +22,13 @@ export default function HistoryCard({ onPress }) {
             </TouchableOpacity>
           </View>
           <View style={styles.priceStatus}>
-            <Text style={[fonts.semibold, { fontSize: 17, marginTop: 4 }]}>
+            <Text style={[Fonts.semibold, { fontSize: 17, marginTop: 4 }]}>
               $ 99.99
             </Text>
             <View style={styles.statusWrapper}>
               <Text
                 style={[
-                  fonts.regular,
+                  Fonts.regular,
                   {
                     fontSize: 13,
                     textAlign: "center",

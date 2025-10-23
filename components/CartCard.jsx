@@ -1,46 +1,72 @@
+import React, { useState } from "react";
 import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { Checkbox } from "react-native-paper";
-import { useState } from "react";
 import Colors from "../constants/Colors";
-import QuantityforCartCard from "./QuantityforCartCard";
-import React from "react";
+import Fonts from "../constants/Fonts";
+import { useCart } from "../context/CartContext";
 
-export default function CartCard({ onPress, name, color, size, price }) {
-  const [checked, setChecked] = useState(false);
+export default function CartCard({ product, onPress, onRemove }) {
+  const { updateQuantity, toggleSelectItem, selectedItems } = useCart();
+  const isSelected = selectedItems.includes(product.id);
+
+  // Safely parse price
+  const priceValue = parseFloat(product.price?.replace(/[^\d.]/g, "") || "0");
 
   return (
     <View style={styles.container}>
       <View style={styles.shadowWrapper}>
         <View style={styles.wrapper}>
+          {/* Product Image */}
           <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
-            <Image
-              source={require("../assets/Images/testingImage.jpg")}
-              style={styles.imageWrap}
-            />
+            <Image source={product.image} style={styles.imageWrap} />
           </TouchableOpacity>
+
+          {/* Product Info */}
           <View style={styles.infoWrapper}>
-            <Text style={[fonts.subtext]}>Product Name</Text>
-            <Text style={[fonts.subtext, { fontSize: 16, marginTop: 10 }]}>
-              Color: <Text>{color}</Text>
+            <Text
+              style={[Fonts.subtext, { fontSize: 16, marginRight: 30 }]}
+              numberOfLines={2}
+              ellipsizeMode="tail"
+            >
+              {product.name}
             </Text>
-            <Text style={[fonts.subtext, { fontSize: 16 }]}>
-              Size: <Text>{size}</Text>
+            <Text style={[Fonts.subtext, { fontSize: 15, marginTop: 10 }]}>
+              Color: <Text>{product.color}</Text>
             </Text>
-            <Text style={[fonts.semibold, { fontSize: 18 }]}>$ 99.99</Text>
+            <Text style={[Fonts.subtext, { fontSize: 15 }]}>
+              Type: <Text>{product.type}</Text>
+            </Text>
+            <Text style={[Fonts.semibold, { fontSize: 18, marginTop: 5 }]}>
+              ₱{priceValue.toLocaleString()}
+            </Text>
           </View>
-          <View style={styles.quantityContainer}>
-            <QuantityforCartCard />
-          </View>
+
+          {/* Checkbox + Remove */}
           <View style={styles.iconWrapper}>
             <View style={{ transform: [{ scale: 0.9 }], marginTop: -7 }}>
               <Checkbox
-                status={checked ? "checked" : "unchecked"}
-                onPress={() => setChecked(!checked)}
+                status={isSelected ? "checked" : "unchecked"}
+                onPress={() => toggleSelectItem(product.id)}
                 color={Colors.primary}
                 uncheckedColor="#000"
                 style={styles.checkbox}
               />
             </View>
+            <TouchableOpacity onPress={onRemove}>
+              <Text
+                style={[
+                  Fonts.minitext,
+                  {
+                    color: "red",
+                    fontSize: 14,
+                    marginTop: 77,
+                    marginRight: 10,
+                  },
+                ]}
+              >
+                Remove
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -69,7 +95,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderRadius: 8,
     width: 358,
-    height: 150,
+    maxHeight: 155,
     position: "relative",
   },
   imageWrap: {
@@ -82,6 +108,7 @@ const styles = StyleSheet.create({
     width: 210,
     paddingLeft: 15,
     justifyContent: "center",
+    marginTop: 8,
   },
   quantityContainer: {
     position: "absolute",
@@ -90,15 +117,12 @@ const styles = StyleSheet.create({
   },
   iconWrapper: {
     position: "absolute",
-    right: 0,
-    top: 5,
+    right: 5,
+    top: 9,
+    alignItems: "flex-end",
   },
   checkbox: {
     width: 23,
     height: 23,
-  },
-  nextIcon: {
-    width: 28,
-    height: 28,
   },
 });

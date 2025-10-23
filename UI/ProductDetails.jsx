@@ -2,23 +2,36 @@ import {
   View,
   Text,
   StatusBar,
-  SafeAreaView,
   TouchableOpacity,
   Image,
   ScrollView,
-  Modal,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../styles/ProductStyle";
 import Colors from "../constants/Colors";
-import fonts from "../constants/Fonts";
+import Fonts from "../constants/Fonts";
 import BreakLine from "../components/BreakLine";
 import RecommendedProdCard from "../components/RecommendedProdCard";
 import ProductBtn from "../components/ProductBtn";
 import CustomModal from "../components/CustomModal";
-import VariantSelection from "../components/VariantSelection";
+import ModalVariantSelection from "../components/ModalVariantSelection";
 import React, { useState } from "react";
+import { useRoute } from "@react-navigation/native";
+import { useCart } from "../context/CartContext";
 
 const ProductDetails = ({ navigation }) => {
+  const route = useRoute();
+  const { product } = route.params || {};
+
+  if (!product) {
+    return (
+      <View style={{ padding: 20 }}>
+        <Text>No product data found.</Text>
+      </View>
+    );
+  }
+  const { addToCart } = useCart();
+
   const [cartModal, setCartModal] = useState(false);
   const [buyModal, setBuyModal] = useState(false);
 
@@ -27,13 +40,10 @@ const ProductDetails = ({ navigation }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background }}>
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
         <View style={styles.imageWrapper}>
-          <Image
-            source={require("../assets/Images/testingImage.jpg")}
-            style={styles.imageStyle}
-          />
+          <Image source={product.image} style={styles.imageStyle} />
           <View style={styles.headerContainer}>
             <TouchableOpacity
               activeOpacity={0.8}
@@ -57,19 +67,20 @@ const ProductDetails = ({ navigation }) => {
           </View>
         </View>
         <View style={{ padding: 15 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Text style={[fonts.title, { fontSize: 22 }]}>Product Name</Text>
+          <View style={{ marginBottom: 10 }}>
+            <Text
+              numberOfLines={2}
+              ellipsizeMode="tail"
+              style={[Fonts.title, { fontSize: 21 }]}
+            >
+              {product.name}
+            </Text>
+
             <View
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                justifyContent: "center",
+                marginTop: 6,
               }}
             >
               <Image
@@ -78,14 +89,15 @@ const ProductDetails = ({ navigation }) => {
               />
               <Text
                 style={[
-                  fonts.minitext,
+                  Fonts.minitext,
                   { fontSize: 11, letterSpacing: 1, color: "#797979" },
                 ]}
               >
-                4.5 <Text>(28 reviews)</Text>
+                {product.rate} {`(${product.review} reviews)`}
               </Text>
             </View>
           </View>
+
           <View
             style={{
               flexDirection: "row",
@@ -93,7 +105,9 @@ const ProductDetails = ({ navigation }) => {
               alignItems: "center",
             }}
           >
-            <Text style={[fonts.semibold, { fontSize: 20 }]}>₱ 999.99</Text>
+            <Text style={[Fonts.semibold, { fontSize: 20 }]}>
+              {product.price}
+            </Text>
 
             <View
               style={{
@@ -104,7 +118,7 @@ const ProductDetails = ({ navigation }) => {
             >
               <Text
                 style={[
-                  fonts.minitext,
+                  Fonts.minitext,
                   { fontSize: 11, letterSpacing: 1, color: "#797979" },
                 ]}
               >
@@ -112,18 +126,9 @@ const ProductDetails = ({ navigation }) => {
               </Text>
             </View>
           </View>
-          <Text style={[fonts.subtext, { fontSize: 17, marginTop: 18 }]}>
-            Description
-          </Text>
-          <Text style={[fonts.regular, { marginTop: 18 }]}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          </Text>
-          <BreakLine />
-          <Text style={[fonts.subtext, { fontSize: 17 }]}>Specification</Text>
-          <Text style={[fonts.regular, { marginTop: 18 }]}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          <Text style={[Fonts.subtext, { fontSize: 17 }]}>Specification</Text>
+          <Text style={[Fonts.regular, { marginTop: 18 }]}>
+            {product.specification}
           </Text>
           <BreakLine />
           <View>
@@ -134,7 +139,7 @@ const ProductDetails = ({ navigation }) => {
                 alignItems: "center",
               }}
             >
-              <Text style={[fonts.subtext, { fontSize: 17 }]}>Reviews</Text>
+              <Text style={[Fonts.subtext, { fontSize: 17 }]}>Reviews</Text>
               <TouchableOpacity
                 activeOpacity={0.8}
                 style={{
@@ -143,7 +148,7 @@ const ProductDetails = ({ navigation }) => {
                   alignItems: "center",
                 }}
               >
-                <Text style={[fonts.minitext, { marginTop: 2 }]}>View All</Text>
+                <Text style={[Fonts.minitext, { marginTop: 2 }]}>View All</Text>
                 <Image
                   source={require("../assets/Images/next.png")}
                   style={{ width: 20, height: 20, marginLeft: 5 }}
@@ -164,13 +169,13 @@ const ProductDetails = ({ navigation }) => {
                       flexWrap: "wrap",
                     }}
                   >
-                    <Text style={[fonts.semibold, { fontSize: 13 }]}>
+                    <Text style={[Fonts.semibold, { fontSize: 13 }]}>
                       John Doe
                     </Text>
                   </View>
                   <Text
                     style={[
-                      fonts.regular,
+                      Fonts.regular,
                       {
                         fontSize: 12,
                         maxWidth: "100%",
@@ -196,13 +201,13 @@ const ProductDetails = ({ navigation }) => {
                       flexWrap: "wrap",
                     }}
                   >
-                    <Text style={[fonts.semibold, { fontSize: 13 }]}>
+                    <Text style={[Fonts.semibold, { fontSize: 13 }]}>
                       John Doe
                     </Text>
                   </View>
                   <Text
                     style={[
-                      fonts.regular,
+                      Fonts.regular,
                       {
                         fontSize: 12,
                         maxWidth: "100%",
@@ -217,7 +222,7 @@ const ProductDetails = ({ navigation }) => {
             </View>
           </View>
           <BreakLine />
-          <Text style={[fonts.subtext, { fontSize: 17 }]}>
+          <Text style={[Fonts.subtext, { fontSize: 17 }]}>
             Related Products
           </Text>
           <View>
@@ -248,10 +253,13 @@ const ProductDetails = ({ navigation }) => {
           fontSize={15}
           width={165}
           btnIcon={require("../assets/Images/icons/cart.png")}
-          onPress={() => setCartModal(true)}
+          onPress={() => {
+            addToCart(product);
+            setCartModal(true);
+          }}
         />
         <ProductBtn
-          backgroundColor={colors.primary}
+          backgroundColor={Colors.primary}
           name={"Buy Now"}
           fontSize={16}
           width={165}
@@ -259,8 +267,13 @@ const ProductDetails = ({ navigation }) => {
           onPress={openBuyModal}
         />
       </View>
-      <CustomModal visibility={cartModal} onPress={() => setCartModal(false)} />
-      <VariantSelection visibility={buyModal} onClose={closeBuyModal} />
+      <CustomModal
+        visibility={cartModal}
+        onPress={() => setCartModal(false)}
+        iconModal={require("../assets/Images/icons/successful.png")}
+        textModal={"Successfully added to Cart"}
+      />
+      <ModalVariantSelection visibility={buyModal} onClose={closeBuyModal} />
     </SafeAreaView>
   );
 };

@@ -1,24 +1,24 @@
 import {
   View,
   Text,
-  SafeAreaView,
   StatusBar,
   Image,
   TouchableOpacity,
   ScrollView,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../styles/ProfileStyle";
-import Header from "../components/Header";
+import DefaultHeader from "../components/DefaultHeader";
 import Fonts from "../constants/Fonts";
 import BreakLine from "../components/BreakLine";
-import OrderHistoryCard from "../components/OrderHistoryCard";
+import OrderStatusCard from "../components/OrderStatusCard";
 import React from "react";
 
 const Profile = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
-      <Header
+      <DefaultHeader
         title={"Profile"}
         onPress={() => navigation.navigate("Notification")}
       />
@@ -53,7 +53,7 @@ const Profile = ({ navigation }) => {
         <Text style={[Fonts.subtext, styles.header]}>Order Status</Text>
         <TouchableOpacity
           activeOpacity={0.8}
-          onPress={() => console.log("History Clicked")}
+          onPress={() => navigation.navigate("OrderHistory")}
           style={styles.historyWrapper}
         >
           <Text style={[Fonts.regular]}>History</Text>
@@ -67,7 +67,7 @@ const Profile = ({ navigation }) => {
         style={styles.cardWrapper}
         showsVerticalScrollIndicator={false}
       >
-        <OrderHistoryCard onPress={() => navigation.navigate("CancelOrder")} />
+        <OrderStatusCard onPress={() => navigation.navigate("CancelOrder")} />
       </ScrollView>
     </SafeAreaView>
   );

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-import fonts from "../constants/Fonts";
+import Fonts from "../constants/Fonts";
 
 const Input = ({
   label,
@@ -21,11 +21,7 @@ const Input = ({
 
   return (
     <View>
-      <Text
-        style={[fonts.regular, { marginTop, fontSize: 17 }]}
-      >
-        {label}
-      </Text>
+      <Text style={[Fonts.regular, { marginTop, fontSize: 17 }]}>{label}</Text>
 
       <View style={styles.inputContainer}>
         <TextInput

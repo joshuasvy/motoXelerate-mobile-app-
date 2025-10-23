@@ -28,7 +28,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footerWrapper: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 60,

@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
-import fonts from "../constants/Fonts";
+import Fonts from "../constants/Fonts";
 
 const Button = ({ title, width, height, backgroundColor, onPress }) => {
   return (
@@ -9,7 +9,7 @@ const Button = ({ title, width, height, backgroundColor, onPress }) => {
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <Text style={[fonts.subtext, { color: "#fff" }]}>{title}</Text>
+      <Text style={[Fonts.subtext, { color: "#fff" }]}>{title}</Text>
     </TouchableOpacity>
   );
 };

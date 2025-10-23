@@ -1,12 +1,12 @@
-import { View, Text, SafeAreaView, StatusBar } from "react-native";
-import React from "react";
+import { View, Text, StatusBar } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useState } from "react";
 import styles from "../styles/SignupStyle";
 import fonts from "../constants/Fonts";
-import HeaderPage from "../components/HeaderPage";
+import colors from "../constants/Colors";
 import Input from "../components/Input";
 import Button from "../components/Button";
-
+import OutsideHeader from "../components/OutsideHeader";
 
 const Signup = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -14,10 +14,14 @@ const Signup = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rePassword, setRePassword] = useState("");
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
-      <HeaderPage name={"Login"} onPress={() => navigation.navigate("Login")} />
+      <OutsideHeader
+        name={"Login"}
+        onPress={() => navigation.navigate("Login")}
+      />
       <View style={styles.wrapper}>
         <Text style={[fonts.header, { marginBottom: 20 }]}>Sign up</Text>
         <Input

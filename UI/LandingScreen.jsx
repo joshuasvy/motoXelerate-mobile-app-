@@ -1,29 +1,28 @@
 import {
   View,
   Text,
-  SafeAreaView,
   StatusBar,
-  TouchableOpacity,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React from "react";
 import styles from "../styles/LandingStyle";
-import fonts from "../constants/Fonts";
-import colors from "../constants/Colors";
-import HeaderPage from "../components/HeaderPage";
+import Fonts from "../constants/Fonts";
+import Colors from "../constants/Colors";
+import OutsideHeader from "../components/OutsideHeader";
 import Button from "../components/Button";
 
 const LandingScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
-      <HeaderPage
+      <OutsideHeader
         name="Login"
         image="https://example.com/laptop.jpg"
         onPress={() => navigation.navigate("Login")}
       />
       <View style={styles.contentWrapper}>
-        <Text style={[fonts.header, { marginBottom: 10 }]}>MOTOXELERATE</Text>
-        <Text style={[fonts.subtext, { textAlign: "center" }]}>
+        <Text style={[Fonts.header, { marginBottom: 10 }]}>MOTOXELERATE</Text>
+        <Text style={[Fonts.subtext, { textAlign: "center" }]}>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua.
         </Text>
@@ -38,21 +37,21 @@ const LandingScreen = ({ navigation }) => {
             borderWidth: 1,
           }}
         />
-        <Text style={[fonts.regular]}>Agree to terms and conditions</Text>
+        <Text style={[Fonts.regular]}>Agree to terms and conditions</Text>
       </View>
       <View style={styles.buttonWrapper}>
         <Button
           title="Login"
           width={150}
           height={50}
-          backgroundColor={colors.primary}
+          backgroundColor={Colors.primary}
           onPress={() => navigation.navigate("Login")}
         />
         <Button
           title="Sign up"
           width={150}
           height={50}
-          backgroundColor={colors.secondary}
+          backgroundColor={Colors.secondary}
           onPress={() => navigation.navigate("Signup")}
         />
       </View>

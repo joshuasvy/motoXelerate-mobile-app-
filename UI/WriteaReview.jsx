@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import styles from "../styles/WriteaReviewStyle";
+import Fonts from "../constants/Fonts";
 import React from "react";
 
 const WriteaReview = ({ navigation }) => {
@@ -25,7 +26,7 @@ const WriteaReview = ({ navigation }) => {
               source={require("../assets/Images/back.png")}
               style={styles.backIcon}
             />
-            <Text style={[fonts.regular, { fontSize: 18, marginTop: 3 }]}>
+            <Text style={[Fonts.regular, { fontSize: 18, marginTop: 3 }]}>
               Back
             </Text>
           </TouchableOpacity>
@@ -34,13 +35,13 @@ const WriteaReview = ({ navigation }) => {
             onPress={() => navigation.navigate("Save button clicked")}
             style={styles.saveBtn}
           >
-            <Text style={[fonts.regular, { fontSize: 18, marginTop: 3 }]}>
+            <Text style={[Fonts.regular, { fontSize: 18, marginTop: 3 }]}>
               Save
             </Text>
           </TouchableOpacity>
         </View>
         <View style={styles.reviewWrapper}>
-          <Text style={[fonts.subtext]}>Review</Text>
+          <Text style={[Fonts.subtext]}>Review</Text>
           <TouchableOpacity actioveOpacity={0.8} style={styles.starBtn}>
             <Image
               source={require("../assets/Images/starOutline.png")}
@@ -69,7 +70,7 @@ const WriteaReview = ({ navigation }) => {
           onPress={() => navigation.navigate("Review button clicked")}
           style={styles.postBtn}
         >
-          <Text style={[fonts.subtext, { textAlign: "center", marginTop: 5 }]}>
+          <Text style={[Fonts.subtext, { textAlign: "center", marginTop: 5 }]}>
             Post
           </Text>
         </TouchableOpacity>

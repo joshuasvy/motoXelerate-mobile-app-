@@ -1,23 +1,23 @@
 import {
   View,
   Text,
-  SafeAreaView,
   StatusBar,
   Image,
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-import React from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 import Fonts from "../constants/Fonts";
-import Header from "../components/Header";
+import DefaultHeader from "../components/DefaultHeader";
 import styles from "../styles/AppointmentStyle";
 import AppointmentCard from "../components/AppointmentCard";
+import React from "react";
 
 const Appointment = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
-      <Header
+      <DefaultHeader
         title={"Appointment"}
         onPress={() => navigation.navigate("Notification")}
       />

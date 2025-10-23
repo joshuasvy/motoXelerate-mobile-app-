@@ -3,42 +3,37 @@ import {
   Text,
   View,
   Image,
-  Dimensions,
   TouchableOpacity,
 } from "react-native";
-import fonts from "../constants/Fonts";
+import Fonts from "../constants/Fonts";
+import product from "../data/product";
 import React from "react";
 
-const screenWidth = Dimensions.get("window").width;
-
-const ProductCard = ({ onPress, productImg, name, price, rate, review }) => {
+const ProductCard = ({ product, onPress }) => {
   return (
     <View style={styles.shadowWrapper}>
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={onPress}
         style={styles.wrapper}
+        onPress={onPress}
       >
-        <Image source={productImg} style={styles.image} />
-        <View style={{ paddingHorizontal: 8, marginTop: 8 }}>
-          <Text style={[fonts.regular, { fontSize: 17 }]}>{name}</Text>
-          <Text style={[fonts.semibold, { fontSize: 16, marginTop: 4 }]}>
-            {price}
-          </Text>
-          <View
-            style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}
+        <Image source={product.image} style={styles.image} />
+        <View style={styles.content}>
+          <Text
+            style={[Fonts.regular, styles.name]}
+            numberOfLines={2}
+            ellipsizeMode="tail"
           >
+            {product.name}
+          </Text>
+          <Text style={[Fonts.semibold, styles.price]}>{product.price}</Text>
+          <View style={styles.ratingRow}>
             <Image
               source={require("../assets/Images/star.png")}
-              style={{ width: 14, height: 14 }}
+              style={styles.star}
             />
-            <Text
-              style={[
-                fonts.minitext,
-                { fontSize: 10, color: "#797979", marginLeft: 5, marginTop: 2 },
-              ]}
-            >
-              {rate} <Text>{review}</Text>
+            <Text style={styles.reviewText}>
+              {product.rate} {`(${product.review} reviews)`}
             </Text>
           </View>
         </View>
@@ -51,7 +46,6 @@ export default ProductCard;
 
 const styles = StyleSheet.create({
   shadowWrapper: {
-    // width: screenWidth * 0.45,
     width: "49%",
     borderRadius: 8,
     backgroundColor: "#fff",
@@ -63,15 +57,42 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   wrapper: {
-    height: 230,
     borderRadius: 8,
     backgroundColor: "#fff",
-    overflow: "hidden",
+    minHeight: 230,
   },
+
   image: {
     width: "100%",
-    height: "55%",
+    height: 130,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
+  },
+  content: {
+    paddingHorizontal: 8,
+    paddingVertical: 10,
+  },
+  name: {
+    fontSize: 15,
+    lineHeight: 18,
+    marginBottom: 5,
+  },
+  price: {
+    fontSize: 16,
+    marginTop: 4,
+  },
+  ratingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 5,
+  },
+  star: {
+    width: 14,
+    height: 14,
+  },
+  reviewText: {
+    fontSize: 10,
+    color: "#797979",
+    marginLeft: 5,
   },
 });
