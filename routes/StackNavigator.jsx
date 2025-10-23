@@ -26,7 +26,7 @@ const StackNavigator = () => {
     <CartProvider>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Signup"
+          initialRouteName="testing"
           screenOptions={{ headerShown: false, animation: "default" }}
         >
           <Stack.Screen name="Landing" component={LandingScreen} />
@@ -51,6 +51,7 @@ const StackNavigator = () => {
             name="OrderStatusDetail"
             component={OrderStatusDetail}
           />
+          <Stack.Screen name="testing" component={Testing} />
         </Stack.Navigator>
       </NavigationContainer>
     </CartProvider>

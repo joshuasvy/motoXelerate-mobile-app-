@@ -13,7 +13,14 @@ export default function ProductBtn({
   color,
 }) {
   return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "space-between", marginBottom: 10, }}>
+    <View
+      style={{
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: 10,
+      }}
+    >
       <View style={styles.shadowWrapper}>
         <TouchableOpacity
           activeOpacity={0.8}
@@ -46,7 +53,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 20,
     alignItems: "center",
-    paddingLeft: 30,
+    paddingLeft: 17,
     borderRadius: 15,
     width: 160,
     height: 50,
