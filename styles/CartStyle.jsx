@@ -12,10 +12,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    justifyContent: "center",
-  },
-  priceContainer: {
-    marginLeft: 50,
+    paddingHorizontal: 25,
   },
   totalPrice: {
     color: "#fff",
@@ -28,7 +25,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     width: 1,
     height: 70,
-    marginLeft: 67,
   },
 });
 

@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -14,14 +15,14 @@ import BreakLine from "../components/BreakLine";
 import RecommendedProdCard from "../components/RecommendedProdCard";
 import ProductBtn from "../components/ProductBtn";
 import CustomModal from "../components/CustomModal";
-import ModalVariantSelection from "../components/ModalVariantSelection";
-import React, { useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import { useCart } from "../context/CartContext";
 
 const ProductDetails = ({ navigation }) => {
+  const { addToCart } = useCart();
   const route = useRoute();
   const { product } = route.params || {};
+  const [cartModal, setCartModal] = useState(false);
 
   if (!product) {
     return (
@@ -30,13 +31,16 @@ const ProductDetails = ({ navigation }) => {
       </View>
     );
   }
-  const { addToCart } = useCart();
 
-  const [cartModal, setCartModal] = useState(false);
-  const [buyModal, setBuyModal] = useState(false);
+  const handleCart = () => {
+    addToCart(product);
+    setCartModal(true);
+  };
 
-  const openBuyModal = () => setBuyModal(true);
-  const closeBuyModal = () => setBuyModal(false);
+  const handleBuyNow = () => {
+    addToCart(product);
+    navigation.navigate("Tab", { screen: "Cart" });
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -253,10 +257,7 @@ const ProductDetails = ({ navigation }) => {
           fontSize={15}
           width={165}
           btnIcon={require("../assets/Images/icons/cart.png")}
-          onPress={() => {
-            addToCart(product);
-            setCartModal(true);
-          }}
+          onPress={handleCart}
         />
         <ProductBtn
           backgroundColor={Colors.primary}
@@ -264,7 +265,7 @@ const ProductDetails = ({ navigation }) => {
           fontSize={16}
           width={165}
           btnIcon={require("../assets/Images/bag.png")}
-          onPress={openBuyModal}
+          onPress={handleBuyNow}
         />
       </View>
       <CustomModal
@@ -273,7 +274,6 @@ const ProductDetails = ({ navigation }) => {
         iconModal={require("../assets/Images/icons/successful.png")}
         textModal={"Successfully added to Cart"}
       />
-      <ModalVariantSelection visibility={buyModal} onClose={closeBuyModal} />
     </SafeAreaView>
   );
 };

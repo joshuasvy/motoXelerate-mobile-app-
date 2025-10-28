@@ -1,6 +1,9 @@
-import { View, Text, SafeAreaView, StatusBar } from "react-native";
-import React from "react";
-import { useState } from "react";
+import { View, Text, StatusBar, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useState, useContext } from "react";
+import { AuthContext } from "../context/authContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import axios from "axios";
 import styles from "../styles/LoginStyle";
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
@@ -11,6 +14,42 @@ import Button from "../components/Button";
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const LOGIN_URL = "https://api-motoxelerate.onrender.com/api/user/login";
+
+  const login = async (email, password) => {
+    const response = await axios.post(LOGIN_URL, { email, password });
+    return response.data;
+  };
+
+  const { setUser } = useContext(AuthContext);
+
+  const handleLogin = async () => {
+    try {
+      const res = await login(email, password); // res = { token, user }
+      const { token, user } = res.data || res; // ✅ safer fallback
+      // ✅ use res, not response
+
+      if (!token) {
+        throw new Error("No token received from server.");
+      }
+
+      await AsyncStorage.setItem("token", token);
+      await AsyncStorage.setItem("user", JSON.stringify(user));
+      setUser(user);
+
+      console.log("🔐 Token saved:", token);
+
+      navigation.navigate("Tab");
+      Alert.alert("✅ Login Successful", `Welcome, ${user.name}`);
+    } catch (err) {
+      console.error("❌ Full login error:", err);
+      const errorMsg =
+        err?.response?.data?.message || err.message || "Login failed";
+      Alert.alert("Error", errorMsg);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
@@ -61,7 +100,7 @@ const Login = ({ navigation }) => {
             width={120}
             height={50}
             backgroundColor={Colors.primary}
-            onPress={() => navigation.navigate("Tab")}
+            onPress={handleLogin}
           />
         </View>
       </View>

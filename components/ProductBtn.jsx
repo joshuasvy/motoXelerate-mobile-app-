@@ -15,7 +15,6 @@ export default function ProductBtn({
   return (
     <View
       style={{
-        flex: 1,
         alignItems: "center",
         justifyContent: "space-between",
         marginBottom: 10,
@@ -53,7 +52,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 20,
     alignItems: "center",
-    paddingLeft: 17,
+    justifyContent: "center",
     borderRadius: 15,
     width: 160,
     height: 50,
@@ -62,5 +61,6 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
     resizeMode: "contain",
+    // marginLeft: 23,
   },
 });

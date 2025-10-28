@@ -7,7 +7,13 @@ export default function AppointmentCard({ banner, title, onPress }) {
     <View style={styles.cardContainer}>
       <Image source={banner} style={styles.banner} />
       <View style={styles.action}>
-        <Text style={[Fonts.semibold, styles.title]}>{title}</Text>
+        <Text
+          style={[Fonts.semibold, styles.title]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {title}
+        </Text>
         <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
           <Image
             source={require("../assets/Images/next.png")}
@@ -23,7 +29,7 @@ const styles = StyleSheet.create({
   cardContainer: {
     borderWidth: 1.2,
     borderColor: "#949494",
-    height: 250,
+    maxHeight: 250,
     borderRadius: 10,
     backgroundColor: "#fff",
     overflow: "hidden",
@@ -32,7 +38,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     elevation: 3,
-    marginBottom: 10,
+    marginBottom: 15,
   },
   banner: {
     borderTopLeftRadius: 10,
@@ -49,11 +55,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   title: {
-    fontSize: 20,
+    fontSize: 17,
+    width: 300,
   },
   nextIcon: {
-    width: 30,
-    height: 30,
+    width: 28,
+    height: 28,
+    marginBottom: 4,
     resizeMode: "contain",
   },
 });

@@ -44,7 +44,7 @@ const Cart = ({ navigation }) => {
       </ScrollView>
 
       <View style={styles.buttonWrapper}>
-        <View style={styles.priceContainer}>
+        <View style={{ marginLeft: 18 }}>
           <Text style={[Fonts.title, styles.totalPrice]}>Total Price</Text>
           <Text style={[Fonts.semibold, styles.price]}>
             ₱{total.toLocaleString()}
@@ -54,8 +54,11 @@ const Cart = ({ navigation }) => {
         <ProductBtn
           name={"Checkout"}
           backgroundColor={"#fff"}
-          onPress={() => console.log("Add to Cart Clicked")}
+          onPress={() => navigation.navigate("Checkout")}
           width={165}
+          fontSize={16}
+          color={"#000000"}
+          btnIcon={require("../assets/Images/bag.png")}
         />
       </View>
     </SafeAreaView>

@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { CartProvider } from "../context/CartContext";
+import { AuthProvider } from "../context/authContext";
 import LandingScreen from "../UI/LandingScreen";
 import Login from "../UI/Login";
 import Signup from "../UI/Signup";
@@ -17,44 +18,51 @@ import WriteaReview from "../UI/WriteaReview";
 import ChangePassword from "../UI/ChangePassword";
 import OrderHistory from "../UI/OrderHistory";
 import OrderStatusDetail from "../UI/OrderStatusDetail";
-import Testing from "../UI/Testing";
+import ServiceDetailsScreen from "../UI/ServiceDetailsScreen";
+import Checkout from "../UI/Checkout";
 
 const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
   return (
-    <CartProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="testing"
-          screenOptions={{ headerShown: false, animation: "default" }}
-        >
-          <Stack.Screen name="Landing" component={LandingScreen} />
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="Signup" component={Signup} />
-          <Stack.Screen name="Products" component={ProductDetails} />
-          <Stack.Screen name="Buy" component={BuyingScreen} />
-          <Stack.Screen name="Tab" component={TabNavigator} />
-          <Stack.Screen name="Notification" component={Notification} />
-          <Stack.Screen
-            name="AppointmentDetails"
-            component={AppointmentDetails}
-          />
-          <Stack.Screen name="EditProfile" component={EditProfile} />
-          <Stack.Screen name="CancelOrder" component={CancelOrder} />
-          <Stack.Screen name="OrderStatus" component={OrderStatus} />
-          <Stack.Screen name="StatusDetails" component={StatusDetails} />
-          <Stack.Screen name="WriteaReview" component={WriteaReview} />
-          <Stack.Screen name="ChangePassword" component={ChangePassword} />
-          <Stack.Screen name="OrderHistory" component={OrderHistory} />
-          <Stack.Screen
-            name="OrderStatusDetail"
-            component={OrderStatusDetail}
-          />
-          <Stack.Screen name="testing" component={Testing} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <NavigationContainer>
+          <Stack.Navigator
+            initialRouteName="Tab"
+            screenOptions={{ headerShown: false, animation: "default" }}
+          >
+            <Stack.Screen name="Landing" component={LandingScreen} />
+            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen name="Signup" component={Signup} />
+            <Stack.Screen name="Products" component={ProductDetails} />
+            <Stack.Screen name="Buy" component={BuyingScreen} />
+            <Stack.Screen name="Tab" component={TabNavigator} />
+            <Stack.Screen name="Notification" component={Notification} />
+            <Stack.Screen
+              name="AppointmentDetails"
+              component={AppointmentDetails}
+            />
+            <Stack.Screen name="EditProfile" component={EditProfile} />
+            <Stack.Screen name="CancelOrder" component={CancelOrder} />
+            <Stack.Screen name="OrderStatus" component={OrderStatus} />
+            <Stack.Screen name="StatusDetails" component={StatusDetails} />
+            <Stack.Screen name="WriteaReview" component={WriteaReview} />
+            <Stack.Screen name="ChangePassword" component={ChangePassword} />
+            <Stack.Screen name="OrderHistory" component={OrderHistory} />
+            <Stack.Screen
+              name="OrderStatusDetail"
+              component={OrderStatusDetail}
+            />
+            <Stack.Screen
+              name="ServiceDetailsScreen"
+              component={ServiceDetailsScreen}
+            />
+            <Stack.Screen name="Checkout" component={Checkout} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </CartProvider>
+    </AuthProvider>
   );
 };
 

@@ -1,3 +1,4 @@
+import React from "react";
 import {
   View,
   Text,
@@ -11,7 +12,7 @@ import Fonts from "../constants/Fonts";
 import DefaultHeader from "../components/DefaultHeader";
 import styles from "../styles/AppointmentStyle";
 import AppointmentCard from "../components/AppointmentCard";
-import React from "react";
+import services from "../data/services";
 
 const Appointment = ({ navigation }) => {
   return (
@@ -32,15 +33,25 @@ const Appointment = ({ navigation }) => {
         />
         <Text style={[Fonts.subtext]}>History</Text>
       </TouchableOpacity>
+
       <ScrollView
         style={styles.cardWrapper}
         showsVerticalScrollIndicator={false}
       >
-        <AppointmentCard
-          banner={require("../assets/Images/banners/testBanner1.jpg")}
-          title={"Service Name"}
-          onPress={() => navigation.navigate("AppointmentDetails")}
-        />
+        {services.map((item, index) => (
+          <AppointmentCard
+            key={index}
+            banner={require("../assets/Images/banners/testBanner1.jpg")}
+            title={item.service}
+            description={item.description}
+            price={`₱ ${item.price}`}
+            onPress={() =>
+              navigation.navigate("ServiceDetailsScreen", {
+                name: encodeURIComponent(item.service),
+              })
+            }
+          />
+        ))}
       </ScrollView>
     </SafeAreaView>
   );

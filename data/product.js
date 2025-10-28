@@ -2,7 +2,7 @@ const product = [
   {
     id: 0,
     name: "RCB Break Caliper S3 Series",
-    price: "₱2,435.0",
+    price: "₱2,435",
     image: require("../assets/Images/product/break caliper s3 series.jpg"),
     specification:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -10,6 +10,7 @@ const product = [
     review: 41,
     color: "Silver",
     type: "2 Pot",
+    variants: ["Standard", "Adjustable", "Gas Type", "Heavy Duty"],
   },
   {
     id: 1,
@@ -20,6 +21,7 @@ const product = [
     review: 20,
     color: "Black",
     type: "330 MM",
+    variants: ["Standard", "Adjustable", "Gas Type", "Heavy Duty"],
   },
   {
     id: 2,

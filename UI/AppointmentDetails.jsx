@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../styles/AppointmentDetailStyle";
 import Fonts from "../constants/Fonts";
 import BreakLine from "../components/BreakLine";
@@ -188,7 +187,7 @@ const AppointmentDetails = ({ navigation }) => {
         </View>
         <BreakLine />
         <View style={styles.textWrapper}>
-          <Text
+          <TouchableOpacity
             style={[
               Fonts.title,
               {
@@ -198,9 +197,18 @@ const AppointmentDetails = ({ navigation }) => {
                 marginBottom: 8,
               },
             ]}
+            onPress={() =>
+              navigation.navigate("ServiceDetailsScreen", {
+                name: encodeURIComponent(serviceName),
+              })
+            }
           >
-            Book Now?
-          </Text>
+            <Text
+              style={[Fonts.regular, { fontSize: 13, textAlign: "center" }]}
+            >
+              Book Now?
+            </Text>
+          </TouchableOpacity>
           <Text style={[Fonts.regular, { fontSize: 13, textAlign: "center" }]}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit.
           </Text>

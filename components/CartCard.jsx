@@ -22,21 +22,23 @@ export default function CartCard({ product, onPress, onRemove }) {
           </TouchableOpacity>
 
           {/* Product Info */}
-          <View style={styles.infoWrapper}>
+          <View
+            style={{
+              flexDirection: "column",
+              justifyContent: "space-between",
+              paddingHorizontal: 15,
+              paddingVertical: 8,
+            }}
+          >
             <Text
-              style={[Fonts.subtext, { fontSize: 16, marginRight: 30 }]}
+              style={[Fonts.subtext, { fontSize: 14, width: 180 }]}
               numberOfLines={2}
               ellipsizeMode="tail"
             >
               {product.name}
             </Text>
-            <Text style={[Fonts.subtext, { fontSize: 15, marginTop: 10 }]}>
-              Color: <Text>{product.color}</Text>
-            </Text>
-            <Text style={[Fonts.subtext, { fontSize: 15 }]}>
-              Type: <Text>{product.type}</Text>
-            </Text>
-            <Text style={[Fonts.semibold, { fontSize: 18, marginTop: 5 }]}>
+
+            <Text style={[Fonts.semibold, { fontSize: 18 }]}>
               ₱{priceValue.toLocaleString()}
             </Text>
           </View>
@@ -52,15 +54,21 @@ export default function CartCard({ product, onPress, onRemove }) {
                 style={styles.checkbox}
               />
             </View>
-            <TouchableOpacity onPress={onRemove}>
+            <TouchableOpacity
+              style={{
+                width: 55,
+                position: "absolute",
+                top: 107,
+                right: 4,
+              }}
+              onPress={onRemove}
+            >
               <Text
                 style={[
                   Fonts.minitext,
                   {
                     color: "red",
-                    fontSize: 14,
-                    marginTop: 77,
-                    marginRight: 10,
+                    fontSize: 13,
                   },
                 ]}
               >
@@ -95,12 +103,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderRadius: 8,
     width: 358,
-    maxHeight: 155,
+    height: 145,
     position: "relative",
   },
   imageWrap: {
-    width: 145,
-    height: 150,
+    width: 130,
+    height: 130,
+    resizeMode: "contain",
     borderTopLeftRadius: 8,
     borderBottomLeftRadius: 8,
   },

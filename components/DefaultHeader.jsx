@@ -38,12 +38,6 @@ export default function DefaultHeader({
             style={styles.icons}
           />
         </TouchableOpacity>
-        <TouchableOpacity activeOpacity={0.8} onPress={chatPress}>
-          <Image
-            source={require("../assets/Images/chat.png")}
-            style={styles.icons}
-          />
-        </TouchableOpacity>
       </View>
     </View>
   );
