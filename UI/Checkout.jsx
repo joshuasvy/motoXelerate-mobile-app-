@@ -1,4 +1,3 @@
-import React from "react";
 import {
   View,
   Text,
@@ -7,6 +6,8 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  Alert,
+  Linking,
 } from "react-native";
 import DefaultHeader from "../components/DefaultHeader";
 import Fonts from "../constants/Fonts";
@@ -15,6 +16,34 @@ import product from "../data/product";
 import ProductBtn from "../components/ProductBtn";
 
 export default function Checkout({ navigation }) {
+  const handleGcashCheckout = async () => {
+    try {
+      const response = await fetch(
+        "https://api-motoxelerate.onrender.com/api/gcash",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: product[0].price,
+            userId: "user-123", // Replace with actual user ID
+          }),
+        }
+      );
+
+      const data = await response.json();
+      const redirectUrl = data.actions?.mobile_web_checkout_url;
+
+      if (redirectUrl) {
+        Linking.openURL(redirectUrl);
+      } else {
+        Alert.alert("Error", "No redirect URL received.");
+      }
+    } catch (error) {
+      console.error("GCash Checkout Error:", error);
+      Alert.alert("Error", "Failed to initiate GCash payment.");
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <StatusBar style="dark" backgroundColor="#fff" />
@@ -148,6 +177,7 @@ export default function Checkout({ navigation }) {
               color={"#FFFFFF"}
               btnIcon={require("../assets/Images/bag.png")}
               width={165}
+              onPress={handleGcashCheckout}
             />
           </View>
         </View>

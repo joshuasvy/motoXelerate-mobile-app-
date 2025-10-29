@@ -1,12 +1,5 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import Fonts from "../constants/Fonts";
-import product from "../data/product";
 import React from "react";
 
 const ProductCard = ({ product, onPress }) => {
@@ -17,24 +10,41 @@ const ProductCard = ({ product, onPress }) => {
         style={styles.wrapper}
         onPress={onPress}
       >
-        <Image source={product.image} style={styles.image} />
+        <Image
+          source={product.image}
+          style={styles.image}
+          resizeMode="contain"
+          defaultSource={require("../assets/Images/product/fallback.png")}
+        />
         <View style={styles.content}>
-          <Text
-            style={[Fonts.regular, styles.name]}
-            numberOfLines={2}
-            ellipsizeMode="tail"
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
           >
-            {product.name}
-          </Text>
-          <Text style={[Fonts.semibold, styles.price]}>{product.price}</Text>
-          <View style={styles.ratingRow}>
-            <Image
-              source={require("../assets/Images/star.png")}
-              style={styles.star}
-            />
-            <Text style={styles.reviewText}>
-              {product.rate} {`(${product.review} reviews)`}
+            <Text
+              style={[Fonts.regular, styles.name]}
+              numberOfLines={2}
+              ellipsizeMode="tail"
+            >
+              {product.name}
             </Text>
+            <Text style={[Fonts.regular, { fontSize: 12, color: "#797979" }]}>
+              {product.stock}
+            </Text>
+          </View>
+
+          <View style={{ position: "absolute", top: 50, left: 10 }}>
+            <Text style={[Fonts.semibold, styles.price]}>
+              ₱ {product.price}
+            </Text>
+            <View style={styles.ratingRow}>
+              <Image
+                source={require("../assets/Images/star.png")}
+                style={styles.star}
+              />
+              <Text style={styles.reviewText}>
+                {product.rate} {`(${product.review} reviews)`}
+              </Text>
+            </View>
           </View>
         </View>
       </TouchableOpacity>
@@ -59,7 +69,7 @@ const styles = StyleSheet.create({
   wrapper: {
     borderRadius: 8,
     backgroundColor: "#fff",
-    minHeight: 230,
+    height: 243,
   },
 
   image: {
@@ -72,14 +82,16 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: 8,
     paddingVertical: 10,
+    position: "relative",
   },
   name: {
     fontSize: 15,
     lineHeight: 18,
     marginBottom: 5,
+    width: "75%",
   },
   price: {
-    fontSize: 16,
+    fontSize: 17,
     marginTop: 4,
   },
   ratingRow: {

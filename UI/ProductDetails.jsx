@@ -110,7 +110,7 @@ const ProductDetails = ({ navigation }) => {
             }}
           >
             <Text style={[Fonts.semibold, { fontSize: 20 }]}>
-              {product.price}
+              ₱ {product.price}
             </Text>
 
             <View
@@ -126,11 +126,13 @@ const ProductDetails = ({ navigation }) => {
                   { fontSize: 11, letterSpacing: 1, color: "#797979" },
                 ]}
               >
-                Stocks <Text>(5)</Text>
+                Stocks: <Text>{product.stock}</Text>
               </Text>
             </View>
           </View>
-          <Text style={[Fonts.subtext, { fontSize: 17 }]}>Specification</Text>
+          <Text style={[Fonts.subtext, { fontSize: 17, marginTop: 15 }]}>
+            Specification
+          </Text>
           <Text style={[Fonts.regular, { marginTop: 18 }]}>
             {product.specification}
           </Text>

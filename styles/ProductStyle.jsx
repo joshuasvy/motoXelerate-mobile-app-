@@ -24,8 +24,7 @@ const styles = StyleSheet.create({
   imageStyle: {
     width: "100%",
     height: "100%",
-    alignSelf: "center",
-    justifyContent: "center",
+    resizeMode: "contain",
   },
   backBtn: {
     backgroundColor: "#fff",

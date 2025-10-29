@@ -20,6 +20,7 @@ import OrderHistory from "../UI/OrderHistory";
 import OrderStatusDetail from "../UI/OrderStatusDetail";
 import ServiceDetailsScreen from "../UI/ServiceDetailsScreen";
 import Checkout from "../UI/Checkout";
+import AppointmentHistory from "../UI/AppointmentHistory";
 
 const Stack = createNativeStackNavigator();
 
@@ -29,7 +30,7 @@ const StackNavigator = () => {
       <CartProvider>
         <NavigationContainer>
           <Stack.Navigator
-            initialRouteName="Tab"
+            initialRouteName="AppointmentHistory"
             screenOptions={{ headerShown: false, animation: "default" }}
           >
             <Stack.Screen name="Landing" component={LandingScreen} />
@@ -59,6 +60,10 @@ const StackNavigator = () => {
               component={ServiceDetailsScreen}
             />
             <Stack.Screen name="Checkout" component={Checkout} />
+            <Stack.Screen
+              name="AppointmentHistory"
+              component={AppointmentHistory}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </CartProvider>

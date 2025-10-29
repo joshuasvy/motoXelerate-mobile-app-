@@ -11,13 +11,39 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../styles/HomeStyle";
 import Fonts from "../constants/Fonts";
-import { useState } from "react";
 import ProductCard from "../components/ProductCard";
-import products from "../data/product";
-import React from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const HomeScreen = ({ navigation }) => {
   const [search, setSearch] = useState("");
+  const [products, setProducts] = useState([]);
+
+  const fetchProducts = async () => {
+    try {
+      const res = await axios.get(
+        "https://api-motoxelerate.onrender.com/api/product"
+      );
+      const mapped = res.data.map((p) => ({
+        id: p._id,
+        name: p.product_Name,
+        image: { uri: p.image },
+        price: p.product_Price,
+        stock: p.stock.toString(),
+        category: p.category,
+        specification: p.product_Specification,
+        rate: "4.5", // placeholder
+        review: "12", // placeholder
+      }));
+      setProducts(mapped);
+    } catch (err) {
+      console.error("Error fetching products:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -53,8 +79,7 @@ const HomeScreen = ({ navigation }) => {
         </View>
       </View>
       <Text style={[Fonts.header, { alignSelf: "center" }]}>MOTOXELERATE</Text>
-      <View>
-      </View>
+      <View></View>
       <SafeAreaView style={{ flex: 1 }}>
         <View
           style={{
@@ -78,7 +103,10 @@ const HomeScreen = ({ navigation }) => {
               />
             )}
             numColumns={2}
-            columnWrapperStyle={{ justifyContent: "space-between" }}
+            columnWrapperStyle={{
+              justifyContent: "space-between",
+              marginBottom: 4, // ✅ vertical gap between rows
+            }}
             showsVerticalScrollIndicator={false}
           />
         </View>
