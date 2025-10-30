@@ -49,7 +49,30 @@ const ServiceDetailsScreen = () => {
   const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) {
-      const formatted = selectedDate.toISOString().split("T")[0];
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const chosen = new Date(selectedDate);
+      chosen.setHours(0, 0, 0, 0);
+
+      const diffInMs = chosen - today;
+      const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+
+      if (diffInDays < 1) {
+        Alert.alert("Invalid Date", "You must book at least 1 day in advance.");
+        return;
+      }
+
+      if (diffInDays > 14) {
+        Alert.alert("Invalid Date", "You can only book up to 2 weeks ahead.");
+        return;
+      }
+
+      const year = chosen.getFullYear();
+      const month = (chosen.getMonth() + 1).toString().padStart(2, "0");
+      const day = chosen.getDate().toString().padStart(2, "0");
+      const formatted = `${year}-${month}-${day}`;
+
       handleChange("date", formatted);
     }
   };
@@ -57,9 +80,12 @@ const ServiceDetailsScreen = () => {
   const handleTimeChange = (event, selectedTime) => {
     setShowTimePicker(false);
     if (selectedTime) {
-      const hours = selectedTime.getHours().toString().padStart(2, "0");
-      const minutes = selectedTime.getMinutes().toString().padStart(2, "0");
-      handleChange("time", `${hours}:${minutes}`);
+      let hour = selectedTime.getHours();
+      const minute = selectedTime.getMinutes().toString().padStart(2, "0");
+      const ampm = hour >= 12 ? "PM" : "AM";
+      hour = hour % 12 || 12; // Convert to 12-hour format
+      const formattedTime = `${hour}:${minute} ${ampm}`;
+      handleChange("time", formattedTime);
     }
   };
 
@@ -73,14 +99,18 @@ const ServiceDetailsScreen = () => {
         return;
       }
 
+      const payload = {
+        userId,
+        date: formData.date,
+        time: formData.time,
+        service_Type: service.service,
+        service_Charge: service.price,
+      };
+      console.log("📤 Booking payload:", payload);
+
       const response = await axios.post(
         "https://api-motoxelerate.onrender.com/api/appointment",
-        {
-          date: formData.date,
-          time: formData.time,
-          service_Type: service.service,
-          service_Charge: service.price,
-        },
+        payload,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -155,6 +185,7 @@ const ServiceDetailsScreen = () => {
                 value={new Date()}
                 display="default"
                 onChange={handleDateChange}
+                minimumDate={new Date()} // ✅ restrict to today or future
               />
             )}
           </View>

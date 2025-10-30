@@ -2,11 +2,11 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import Fonts from "../constants/Fonts";
 import React from "react";
 
-export default function RecommendedProdCard() {
+export default function RecommendedProdCard({ product }) {
   return (
     <View style={styles.wrapper}>
       <Image
-        source={require("../assets/Images/resume-pic.png")}
+        source={{ uri: product.image }}
         style={{
           width: 200,
           height: "50%",
@@ -15,9 +15,9 @@ export default function RecommendedProdCard() {
         }}
       />
       <View style={{ padding: 8, marginTop: 5 }}>
-        <Text style={[Fonts.regular, { fontSize: 18 }]}>Product Name</Text>
+        <Text style={[Fonts.regular, { fontSize: 18 }]}>{product.name}</Text>
         <Text style={[Fonts.semibold, { fontSize: 17, marginTop: 10 }]}>
-          $ 99.99
+          ₱ {product.price}
         </Text>
         <View
           style={{ flexDirection: "row", alignItems: "center", marginTop: 15 }}
@@ -32,7 +32,7 @@ export default function RecommendedProdCard() {
               { fontSize: 10, color: "#797979", marginLeft: 5, marginTop: 2 },
             ]}
           >
-            4.9 <Text>(27 reviews)</Text>
+            {product.rate} <Text>({product.review} reviews)</Text>
           </Text>
         </View>
       </View>

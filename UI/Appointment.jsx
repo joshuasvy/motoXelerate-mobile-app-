@@ -25,7 +25,7 @@ const Appointment = ({ navigation }) => {
       <TouchableOpacity
         activeOpacity={0.8}
         style={styles.historyBtnWrapper}
-        onPress={() => console.log("History Clicked")}
+        onPress={() => navigation.navigate("AppointmentHistory")}
       >
         <Image
           source={require("../assets/Images/history.png")}

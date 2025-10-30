@@ -2,14 +2,17 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
 import React from "react";
+import { formattedDateTime } from "../utils/formattedDateTIme";
 
 export default function AppointmentHistoryCard({
-  serviceName,
+  service_Type,
   date,
   time,
   status,
   onPress,
 }) {
+  const { formattedDate, formattedTime } = formattedDateTime(date, time);
+
   return (
     <View style={styles.container}>
       <View style={styles.shadowWrapper}>
@@ -19,26 +22,49 @@ export default function AppointmentHistoryCard({
             style={styles.imageWrap}
           />
           <View style={styles.infoWrapper}>
-            <Text style={[Fonts.subtext]}>{serviceName}</Text>
-            <Text style={[Fonts.subtext, { fontSize: 16, marginTop: 13 }]}>
-              Date: <Text>{date}</Text>
-            </Text>
-            <Text style={[Fonts.subtext, { fontSize: 16 }]}>
-              Time: <Text>{time}</Text>
+            <Text
+              numberOfLines={2}
+              ellipsizeMode="tail"
+              style={[Fonts.subtext, { fontSize: 15, width: "100%" }]}
+            >
+              {service_Type}
             </Text>
 
-            <View style={styles.statusRow}>
-              <View style={styles.statusWrapper}>
-                <Text style={[Fonts.regular, { fontSize: 14 }]}>{status}</Text>
+            <View style={{ position: "absolute", bottom: 6, width: "100%" }}>
+              <Text style={[Fonts.subtext, { fontSize: 14, marginTop: 13 }]}>
+                Date:{" "}
+                <Text
+                  style={[Fonts.regular, { fontSize: 14, color: "#565656ff" }]}
+                >
+                  {formattedDate}
+                </Text>
+              </Text>
+              <Text style={[Fonts.subtext, { fontSize: 14 }]}>
+                Time:{" "}
+                <Text
+                  style={[Fonts.regular, { fontSize: 14, color: "#565656ff" }]}
+                >
+                  {formattedTime}
+                </Text>
+              </Text>
+
+              <View style={styles.statusRow}>
+                <View style={styles.statusWrapper}>
+                  <Text
+                    style={[Fonts.regular, { fontSize: 13, color: "#ffffff" }]}
+                  >
+                    {status}
+                  </Text>
+                </View>
+                {onPress && (
+                  <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
+                    <Image
+                      source={require("../assets/Images/next.png")}
+                      style={styles.nextIcon}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
-              {onPress && (
-                <TouchableOpacity activeOpacity={0.8} onPress={onPress}>
-                  <Image
-                    source={require("../assets/Images/next.png")}
-                    style={styles.nextIcon}
-                  />
-                </TouchableOpacity>
-              )}
             </View>
           </View>
         </View>
@@ -67,32 +93,33 @@ const styles = StyleSheet.create({
   wrapper: {
     flexDirection: "row",
     borderRadius: 8,
-    width: 373,
-    height: 168,
+    width: 375,
+    height: 150,
     position: "relative",
   },
   imageWrap: {
-    width: 145,
-    height: 159,
+    width: 130,
+    height: "fit-content",
     margin: 3,
     resizeMode: "cover",
     borderRadius: 8,
   },
   infoWrapper: {
-    marginLeft: 8,
-    justifyContent: "center",
+    marginHorizontal: 8,
+    paddingVertical: 5,
+    width: 230,
   },
   statusRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    marginTop: 13,
+    justifyContent: "space-between",
+    marginTop: 5,
   },
   statusWrapper: {
-    paddingHorizontal: 9,
-    paddingVertical: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     backgroundColor: Colors.primary,
-    borderRadius: 15,
+    borderRadius: 12,
   },
   nextIcon: {
     width: 26,

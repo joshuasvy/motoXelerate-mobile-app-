@@ -1,15 +1,43 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import {
+  Animated,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { Checkbox } from "react-native-paper";
+import React, { useRef } from "react";
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
-import { useCart } from "../context/CartContext";
 
-export default function CartCard({ product, onPress, onRemove }) {
-  const { updateQuantity, toggleSelectItem, selectedItems } = useCart();
-  const isSelected = selectedItems.includes(product.id);
+export default function CartCard({
+  product,
+  onPress,
+  onRemove,
+  isSelected,
+  onToggleSelect,
+  onQuantityChange,
+}) {
+  const scaleMinus = useRef(new Animated.Value(1)).current;
+  const scalePlus = useRef(new Animated.Value(1)).current;
 
-  // Safely parse price
+  const animate = (ref) => {
+    Animated.sequence([
+      Animated.timing(ref, {
+        toValue: 0.9,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(ref, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
   const priceValue = parseFloat(product.price?.replace(/[^\d.]/g, "") || "0");
 
   return (
@@ -31,7 +59,7 @@ export default function CartCard({ product, onPress, onRemove }) {
             }}
           >
             <Text
-              style={[Fonts.subtext, { fontSize: 14, width: 180 }]}
+              style={[Fonts.subtext, { fontSize: 14, width: 165 }]}
               numberOfLines={2}
               ellipsizeMode="tail"
             >
@@ -41,41 +69,72 @@ export default function CartCard({ product, onPress, onRemove }) {
             <Text style={[Fonts.semibold, { fontSize: 18 }]}>
               ₱{priceValue.toLocaleString()}
             </Text>
+
+            {/* Quantity Display Only */}
+            <View style={styles.quantityControls}>
+              <Animated.View style={{ transform: [{ scale: scaleMinus }] }}>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={styles.qtyBtn}
+                  onPress={() => {
+                    if (product.quantity > 1) {
+                      animate(scaleMinus);
+                      onQuantityChange(product.quantity - 1); // ✅ decrement
+                    }
+                  }}
+                >
+                  <Text style={styles.qtyText}>−</Text>
+                </TouchableOpacity>
+              </Animated.View>
+
+              <Text style={[Fonts.regular, styles.qtyCount]}>
+                {product.quantity || 1}
+              </Text>
+
+              <Animated.View style={{ transform: [{ scale: scalePlus }] }}>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  style={styles.qtyBtn}
+                  onPress={() => {
+                    if (product.quantity < product.stock) {
+                      console.log("🧪 CartCard product:", product);
+                      onQuantityChange(product.quantity + 1);
+                    } else {
+                      Alert.alert(
+                        "Stock Limit Reached",
+                        `Maximum quantity for ${
+                          product.name || "this product"
+                        } is ${product.stock}.`
+                      );
+                    }
+                  }}
+                  disabled={product.quantity >= product.stock}
+                >
+                  <Text style={styles.qtyText}>+</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
           </View>
 
-          {/* Checkbox + Remove */}
-          <View style={styles.iconWrapper}>
-            <View style={{ transform: [{ scale: 0.9 }], marginTop: -7 }}>
-              <Checkbox
-                status={isSelected ? "checked" : "unchecked"}
-                onPress={() => toggleSelectItem(product.id)}
-                color={Colors.primary}
-                uncheckedColor="#000"
-                style={styles.checkbox}
-              />
-            </View>
-            <TouchableOpacity
-              style={{
-                width: 55,
-                position: "absolute",
-                top: 107,
-                right: 4,
-              }}
-              onPress={onRemove}
-            >
-              <Text
-                style={[
-                  Fonts.minitext,
-                  {
-                    color: "red",
-                    fontSize: 13,
-                  },
-                ]}
-              >
-                Remove
-              </Text>
-            </TouchableOpacity>
+          {/* Checkbox and Remove Button */}
+          <View style={{ position: "absolute", top: 0, right: 0 }}>
+            <Checkbox
+              status={isSelected ? "checked" : "unchecked"}
+              onPress={() => onToggleSelect(product)}
+              color={Colors.primary}
+              uncheckedColor="#000"
+            />
           </View>
+          <TouchableOpacity
+            style={{ position: "absolute", bottom: 8, right: 9 }}
+            onPress={onRemove}
+          >
+            <Image
+              source={require("../assets/Images/icons/delete.png")}
+              alt="Delete icon"
+              style={styles.deleteIcon}
+            />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -102,36 +161,43 @@ const styles = StyleSheet.create({
   wrapper: {
     flexDirection: "row",
     borderRadius: 8,
-    width: 358,
-    height: 145,
+    width: 355,
+    height: 135,
     position: "relative",
   },
   imageWrap: {
-    width: 130,
-    height: 130,
+    width: 120,
+    height: 120,
     resizeMode: "contain",
     borderTopLeftRadius: 8,
     borderBottomLeftRadius: 8,
   },
-  infoWrapper: {
-    width: 210,
-    paddingLeft: 15,
+  quantityControls: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  qtyBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    backgroundColor: Colors.primary,
+    alignItems: "center",
     justifyContent: "center",
-    marginTop: 8,
   },
-  quantityContainer: {
-    position: "absolute",
-    right: 10,
-    bottom: 8,
+  qtyText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
   },
-  iconWrapper: {
-    position: "absolute",
-    right: 5,
-    top: 9,
-    alignItems: "flex-end",
+  qtyCount: {
+    fontSize: 15,
+    minWidth: 23,
+    textAlign: "center",
   },
-  checkbox: {
+  deleteIcon: {
     width: 23,
     height: 23,
+    resizeMode: "contain",
   },
 });

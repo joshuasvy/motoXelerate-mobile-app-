@@ -3,7 +3,7 @@ import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
 import React from "react";
 
-export default function AddressWrapper({ nextIcon}) {
+export default function AddressWrapper({ nextIcon }) {
   return (
     <View style={styles.addressWrapper}>
       <Text style={[Fonts.semibold, { fontSize: 19, marginTop: 5 }]}>
@@ -12,10 +12,7 @@ export default function AddressWrapper({ nextIcon}) {
       <Text style={[Fonts.regular, { fontSize: 13 }]}>
         Blk 13 Lot 82 Phase 3F Lorem ipsum Consectetur adipiscing
       </Text>
-      <Image
-        source={nextIcon}
-        style={styles.nextBtn}
-      />
+      <Image source={nextIcon} style={styles.nextBtn} />
     </View>
   );
 }
@@ -23,9 +20,10 @@ export default function AddressWrapper({ nextIcon}) {
 const styles = StyleSheet.create({
   addressWrapper: {
     backgroundColor: Colors.primary,
+    height: 110,
     borderRadius: 8,
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingVertical: 8,
     position: "relative",
   },
   nextBtn: {
@@ -35,6 +33,5 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 10,
     bottom: 10,
-    padding: 10,
   },
 });

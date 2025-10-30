@@ -16,7 +16,7 @@ export default function TabNavigator() {
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <Tab.Navigator
-        initialRouteName="Home"
+        initialRouteName="Cart"
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused }) => (
             <TabIcon focused={focused} routeName={route.name} />

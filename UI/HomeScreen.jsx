@@ -98,7 +98,9 @@ const HomeScreen = ({ navigation }) => {
               <ProductCard
                 product={item}
                 onPress={() =>
-                  navigation.navigate("Products", { product: item })
+                  navigation.navigate("Products", {
+                    product: { ...item, _id: item.id }, // ✅ normalize _id
+                  })
                 }
               />
             )}
