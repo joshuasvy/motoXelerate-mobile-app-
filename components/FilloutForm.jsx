@@ -55,6 +55,7 @@ const styles = StyleSheet.create({
         width: 160,
         backgroundColor: "transparent",
         overflow: "hidden",
-        textAlign: "left",
+        // textAlign: "left",
+        borderWidth: 1,
     },
 });

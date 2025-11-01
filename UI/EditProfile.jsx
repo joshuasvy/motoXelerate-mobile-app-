@@ -100,13 +100,73 @@ const EditProfile = ({ navigation }) => {
         }
     };
 
+    const handleSave = async () => {
+        try {
+            const token = await AsyncStorage.getItem("token");
+            if (!token) return;
+
+            // ✅ Upload to Cloudinary
+            const formData = new FormData();
+            formData.append("file", {
+                uri: profileImage,
+                type: "image/jpeg",
+                name: "profile.jpg",
+            });
+            formData.append("upload_preset", "MotoXelerate"); // ✅ your preset
+            formData.append("folder", "e-commerce"); // ✅ optional folder
+
+            const cloudinaryRes = await fetch(
+                "https://api.cloudinary.com/v1_1/dhh37ekzf/image/upload",
+                {
+                    method: "POST",
+                    body: formData,
+                }
+            );
+
+            const cloudinaryData = await cloudinaryRes.json();
+            const hostedImageUrl = cloudinaryData.secure_url;
+
+            if (!hostedImageUrl) {
+                console.error("❌ Cloudinary upload failed:", cloudinaryData);
+                return;
+            }
+
+            // ✅ Send hosted URL to backend
+            const response = await fetch(
+                `https://api-motoxelerate.onrender.com/api/user/${userId}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ image: hostedImageUrl }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (response.ok) {
+                console.log("✅ Profile image updated:", data.image);
+                navigation.goBack();
+            } else {
+                console.error(
+                    "❌ Failed to update profile:",
+                    data.message || data.error
+                );
+            }
+        } catch (error) {
+            console.error("❌ Error saving profile:", error);
+        }
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
             <SimpleHeader
                 title={"Edit Profile"}
                 goBack={() => navigation.goBack()}
-                saveBtn={() => navigation.goBack()}
+                saveBtn={handleSave}
                 saveTxt={"Save"}
             />
 
