@@ -19,51 +19,68 @@ import OrderStatusDetail from "../UI/OrderStatusDetail";
 import ServiceDetailsScreen from "../UI/ServiceDetailsScreen";
 import Checkout from "../UI/Checkout";
 import AppointmentHistory from "../UI/AppointmentHistory";
+// import Testing from "../Testing";
 
 const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
-  return (
-    <AuthProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="Login"
-          screenOptions={{ headerShown: false, animation: "default" }}
-        >
-          <Stack.Screen name="Landing" component={LandingScreen} />
-          <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="Signup" component={Signup} />
-          <Stack.Screen name="Products" component={ProductDetails} />
-          <Stack.Screen name="Checkout" component={Checkout} />
-          <Stack.Screen name="Tab" component={TabNavigator} />
-          <Stack.Screen name="Notification" component={Notification} />
-          <Stack.Screen
-            name="AppointmentDetails"
-            component={AppointmentDetails}
-          />
-          <Stack.Screen name="EditProfile" component={EditProfile} />
-          <Stack.Screen name="CancelOrder" component={CancelOrder} />
-          <Stack.Screen name="OrderStatus" component={OrderStatus} />
-          <Stack.Screen name="StatusDetails" component={StatusDetails} />
-          <Stack.Screen name="WriteaReview" component={WriteaReview} />
-          <Stack.Screen name="ChangePassword" component={ChangePassword} />
-          <Stack.Screen name="OrderHistory" component={OrderHistory} />
-          <Stack.Screen
-            name="OrderStatusDetail"
-            component={OrderStatusDetail}
-          />
-          <Stack.Screen
-            name="ServiceDetailsScreen"
-            component={ServiceDetailsScreen}
-          />
-          <Stack.Screen
-            name="AppointmentHistory"
-            component={AppointmentHistory}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </AuthProvider>
-  );
+    return (
+        <AuthProvider>
+            <NavigationContainer>
+                <Stack.Navigator
+                    initialRouteName="Login"
+                    screenOptions={{ headerShown: false, animation: "default" }}
+                >
+                    <Stack.Screen name="Landing" component={LandingScreen} />
+                    <Stack.Screen name="Login" component={Login} />
+                    <Stack.Screen name="Signup" component={Signup} />
+                    <Stack.Screen name="Products" component={ProductDetails} />
+                    <Stack.Screen name="Checkout" component={Checkout} />
+                    <Stack.Screen name="Tab" component={TabNavigator} />
+                    <Stack.Screen
+                        name="Notification"
+                        component={Notification}
+                    />
+                    <Stack.Screen
+                        name="AppointmentDetails"
+                        component={AppointmentDetails}
+                    />
+                    <Stack.Screen name="EditProfile" component={EditProfile} />
+                    <Stack.Screen name="CancelOrder" component={CancelOrder} />
+                    <Stack.Screen name="OrderStatus" component={OrderStatus} />
+                    <Stack.Screen
+                        name="StatusDetails"
+                        component={StatusDetails}
+                    />
+                    <Stack.Screen
+                        name="WriteaReview"
+                        component={WriteaReview}
+                    />
+                    <Stack.Screen
+                        name="ChangePassword"
+                        component={ChangePassword}
+                    />
+                    <Stack.Screen
+                        name="OrderHistory"
+                        component={OrderHistory}
+                    />
+                    <Stack.Screen
+                        name="OrderStatusDetail"
+                        component={OrderStatusDetail}
+                    />
+                    <Stack.Screen
+                        name="ServiceDetailsScreen"
+                        component={ServiceDetailsScreen}
+                    />
+                    <Stack.Screen
+                        name="AppointmentHistory"
+                        component={AppointmentHistory}
+                    />
+                    {/* <Stack.Screen name="Testing" component={Testing} /> */}
+                </Stack.Navigator>
+            </NavigationContainer>
+        </AuthProvider>
+    );
 };
 
 export default StackNavigator;

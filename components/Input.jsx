@@ -16,20 +16,33 @@ const Input = ({
   placeholder,
   secureTextEntry,
   marginTop,
+  leftIcon,
+  keyboardType = "default",
+  inputMode,
+  returnKeyType = "done",
+  blurOnSubmit = true,
+  onSubmitEditing,
+  inputRef,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(secureTextEntry);
 
   return (
     <View>
       <Text style={[Fonts.regular, { marginTop, fontSize: 17 }]}>{label}</Text>
-
       <View style={styles.inputContainer}>
+        {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
         <TextInput
+          ref={inputRef}
           style={styles.input}
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
           secureTextEntry={secureTextEntry ? isPasswordVisible : false}
+          keyboardType={keyboardType}
+          inputMode={inputMode}
+          returnKeyType={returnKeyType}
+          blurOnSubmit={blurOnSubmit}
+          onSubmitEditing={onSubmitEditing}
         />
         {secureTextEntry && (
           <TouchableOpacity
@@ -49,6 +62,11 @@ const Input = ({
 };
 
 const styles = StyleSheet.create({
+  leftIcon: {
+    marginRight: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -59,7 +77,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.2,
     shadowRadius: 6.0,
-    elevation: 5, 
+    elevation: 5,
   },
   input: {
     flex: 1,

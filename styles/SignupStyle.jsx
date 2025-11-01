@@ -5,8 +5,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+    position: "relative",
   },
   wrapper: {
+    flexGrow: 1,
     justifyContent: "center",
     paddingHorizontal: 35,
   },

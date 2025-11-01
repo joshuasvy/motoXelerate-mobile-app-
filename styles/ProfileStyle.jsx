@@ -14,9 +14,11 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   profilePic: {
-    borderRadius: 50,
-    width: 120,
-    height: 120,
+    borderRadius: 100,
+    borderWidth: 2,
+    borderColor: "#ffffff",
+    width: 135,
+    height: 135,
     marginRight: 15,
   },
   infoContainer: {
@@ -29,13 +31,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   buttonContainer: {
-    width: 195,
-    height: 43,
-    alignItems: "center",
-    justifyContent: "center",
+    marginTop: 10,
+    width: "60%",
     backgroundColor: Colors.primary,
-    borderRadius: 13,
-    marginTop: 18,
+    borderRadius: 10,
+    paddingVertical: 4,
   },
   headerContainer: {
     flexDirection: "row",
