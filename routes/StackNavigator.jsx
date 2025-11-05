@@ -14,7 +14,6 @@ import OrderStatus from "../UI/OrderStatus";
 import StatusDetails from "../UI/StatusDetails";
 import WriteaReview from "../UI/WriteaReview";
 import ChangePassword from "../UI/ChangePassword";
-import OrderHistory from "../UI/OrderHistory";
 import OrderStatusDetail from "../UI/OrderStatusDetail";
 import ServiceDetailsScreen from "../UI/ServiceDetailsScreen";
 import Checkout from "../UI/Checkout";
@@ -59,10 +58,6 @@ const StackNavigator = () => {
                     <Stack.Screen
                         name="ChangePassword"
                         component={ChangePassword}
-                    />
-                    <Stack.Screen
-                        name="OrderHistory"
-                        component={OrderHistory}
                     />
                     <Stack.Screen
                         name="OrderStatusDetail"

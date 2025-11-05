@@ -8,12 +8,14 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
+import { ActivityIndicator } from "react-native";
 import styles from "../styles/EditProfileStyle";
 import Fonts from "../constants/Fonts";
 import Colors from "../constants/Colors";
 import SimpleHeader from "../components/SimpleHeader";
 import FilloutForm from "../components/FilloutForm";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
+import { Animated } from "react-native";
 import { AuthContext } from "../context/authContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -27,6 +29,8 @@ const EditProfile = ({ navigation }) => {
     const [email, setEmail] = useState("");
     const [contact, setContact] = useState("");
     const [profileImage, setProfileImage] = useState(DEFAULT_IMAGE);
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const fadeAnim = useRef(new Animated.Value(0)).current;
 
     const { user } = useContext(AuthContext);
     const userId = user?._id;
@@ -69,6 +73,10 @@ const EditProfile = ({ navigation }) => {
         fetchUserInfo();
     }, []);
 
+    useEffect(() => {
+        setImageLoaded(false);
+    }, [profileImage]);
+
     const pickImage = async () => {
         console.log("📸 Image picker triggered");
 
@@ -105,34 +113,27 @@ const EditProfile = ({ navigation }) => {
             const token = await AsyncStorage.getItem("token");
             if (!token) return;
 
-            // ✅ Upload to Cloudinary
+            // Upload to Cloudinary
             const formData = new FormData();
             formData.append("file", {
                 uri: profileImage,
-                type: "image/jpeg",
+                type: "image/*",
                 name: "profile.jpg",
             });
-            formData.append("upload_preset", "MotoXelerate"); // ✅ your preset
-            formData.append("folder", "e-commerce"); // ✅ optional folder
+            formData.append("upload_preset", "MotoXelerate");
+            formData.append("folder", "profile");
 
             const cloudinaryRes = await fetch(
                 "https://api.cloudinary.com/v1_1/dhh37ekzf/image/upload",
-                {
-                    method: "POST",
-                    body: formData,
-                }
+                { method: "POST", body: formData }
             );
 
             const cloudinaryData = await cloudinaryRes.json();
             const hostedImageUrl = cloudinaryData.secure_url;
+            if (!hostedImageUrl) return;
 
-            if (!hostedImageUrl) {
-                console.error("❌ Cloudinary upload failed:", cloudinaryData);
-                return;
-            }
-
-            // ✅ Send hosted URL to backend
-            const response = await fetch(
+            // Update backend
+            await fetch(
                 `https://api-motoxelerate.onrender.com/api/user/${userId}`,
                 {
                     method: "PUT",
@@ -144,20 +145,37 @@ const EditProfile = ({ navigation }) => {
                 }
             );
 
-            const data = await response.json();
+            // ✅ Re-fetch updated profile
+            const refreshRes = await fetch(
+                "https://api-motoxelerate.onrender.com/api/user/me",
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                }
+            );
+            const refreshedData = await refreshRes.json();
+            setProfileImage(refreshedData.image || DEFAULT_IMAGE);
 
-            if (response.ok) {
-                console.log("✅ Profile image updated:", data.image);
-                navigation.goBack();
-            } else {
-                console.error(
-                    "❌ Failed to update profile:",
-                    data.message || data.error
-                );
-            }
+            console.log("✅ Profile image refreshed:", refreshedData.image);
+            navigation.goBack();
         } catch (error) {
             console.error("❌ Error saving profile:", error);
         }
+    };
+
+    const handleLogout = () => {
+        console.log("🚪 Logging out user:", user?.email || user?._id);
+
+        // Clear auth context (if using context)
+        // If you have a logout method in AuthContext, call it:
+        if (typeof logout === "function") {
+            logout(); // ✅ clears user session
+        }
+
+        // Navigate to login screen
+        navigation.reset({
+            index: 0,
+            routes: [{ name: "Login" }],
+        });
     };
 
     return (
@@ -172,10 +190,34 @@ const EditProfile = ({ navigation }) => {
 
             <View style={styles.profileContainer}>
                 <TouchableOpacity onPress={pickImage} activeOpacity={0.8}>
-                    <Image
-                        source={{ uri: profileImage }}
-                        style={styles.profile}
+                    {!imageLoaded && (
+                        <ActivityIndicator
+                            size="large"
+                            color={Colors.primary}
+                            style={styles.profile}
+                        />
+                    )}
+
+                    <Animated.Image
+                        source={{ uri: `${profileImage}?t=${Date.now()}` }}
+                        style={[
+                            styles.profile,
+                            { opacity: fadeAnim },
+                            !imageLoaded && { display: "none" },
+                        ]}
                         resizeMode="cover"
+                        onLoad={() => {
+                            setImageLoaded(true);
+                            Animated.timing(fadeAnim, {
+                                toValue: 1,
+                                duration: 300,
+                                useNativeDriver: true,
+                            }).start();
+                        }}
+                        onError={() => {
+                            console.warn("❌ Image failed to load");
+                            setImageLoaded(true); // fallback to hide spinner
+                        }}
                     />
                     <Image
                         source={require("../assets/Images/icons/imageUpload.png")}
@@ -183,7 +225,6 @@ const EditProfile = ({ navigation }) => {
                     />
                 </TouchableOpacity>
             </View>
-
             <FilloutForm
                 title={"First Name"}
                 value={firstName}
@@ -236,6 +277,22 @@ const EditProfile = ({ navigation }) => {
                     marginTop: 5,
                 }}
             />
+            <View style={styles.logoutWrapper}>
+                <TouchableOpacity
+                    style={styles.logoutBtn}
+                    activeOpacity={0.8}
+                    onPress={handleLogout} // ✅ attach logout function
+                >
+                    <Text
+                        style={[
+                            Fonts.subtext,
+                            { fontSize: 17, color: "#ffffff" },
+                        ]}
+                    >
+                        Log out
+                    </Text>
+                </TouchableOpacity>
+            </View>
         </SafeAreaView>
     );
 };

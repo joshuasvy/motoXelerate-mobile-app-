@@ -6,60 +6,50 @@ import {
     TextInput,
     TouchableOpacity,
     FlatList,
+    RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../styles/HomeStyle";
 import Fonts from "../constants/Fonts";
 import ProductCard from "../components/ProductCard";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import axios from "axios";
-import fallbackImage from "../assets/Images/product/fallbackImage.png"; // ✅ fallback image
+import fallbackImage from "../assets/Images/product/fallbackImage.png";
 
 const HomeScreen = ({ navigation }) => {
     const [search, setSearch] = useState("");
     const [products, setProducts] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
 
     const fetchProducts = async () => {
         try {
-            console.log("📡 Fetching products from API...");
             const res = await axios.get(
                 "https://api-motoxelerate.onrender.com/api/product"
             );
 
-            if (!Array.isArray(res.data)) {
-                console.warn(
-                    "⚠️ Unexpected product response format:",
-                    res.data
-                );
-                return;
-            }
+            if (!Array.isArray(res.data)) return;
 
-            const mapped = res.data.map((p, index) => {
-                const fallbackUsed = !p.image;
-                if (fallbackUsed) {
-                    console.log(
-                        `🖼️ Using fallback image for product at index ${index}:`,
-                        p.productName
-                    );
-                }
+            const mapped = res.data
+                .map((p) => {
+                    if (!p._id || !p.productName || p.price === undefined)
+                        return null;
+                    return {
+                        id: p._id,
+                        name: p.productName,
+                        image: p.image ? { uri: p.image } : fallbackImage,
+                        price: p.price,
+                        stock: p.stock?.toString() || "0",
+                        category: p.category,
+                        specification: p.specification,
+                        rate: "4.5",
+                        review: "12",
+                    };
+                })
+                .filter(Boolean);
 
-                return {
-                    id: p._id,
-                    name: p.productName,
-                    image: p.image ? { uri: p.image } : fallbackImage,
-                    price: p.price,
-                    stock: p.stock?.toString() || "0",
-                    category: p.category,
-                    specification: p.specification,
-                    rate: "4.5", // placeholder
-                    review: "12", // placeholder
-                };
-            });
-
-            console.log("✅ Products mapped:", mapped);
             setProducts(mapped);
         } catch (err) {
-            console.error("❌ Error fetching products:", err.message);
+            console.error("Error fetching products:", err.message);
         }
     };
 
@@ -67,21 +57,55 @@ const HomeScreen = ({ navigation }) => {
         fetchProducts();
     }, []);
 
+    const onRefresh = async () => {
+        setRefreshing(true);
+        try {
+            await fetchProducts();
+        } catch (err) {
+            console.error("Error refreshing:", err.message);
+        } finally {
+            setRefreshing(false);
+        }
+    };
+
+    const filteredProducts = useMemo(() => {
+        const query = search.toLowerCase().trim();
+        if (!query) return products;
+
+        return products.filter((product) => {
+            const name = product.name?.toLowerCase() || "";
+            const spec = product.specification?.toLowerCase() || "";
+            const category = product.category?.toLowerCase() || "";
+            return (
+                name.includes(query) ||
+                spec.includes(query) ||
+                category.includes(query)
+            );
+        });
+    }, [search, products]);
+
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
+            <StatusBar barStyle="light-content" backgroundColor="#fff" />
+
+            {/* ✅ Search bar outside FlatList */}
             <View style={styles.header}>
                 <View style={styles.logo} />
-                <TextInput
-                    style={[Fonts.regular, styles.input]}
-                    placeholder={"Search..."}
-                    value={search}
-                    onChangeText={setSearch}
-                />
-                <Image
-                    source={require("../assets/Images/search.png")}
-                    style={styles.searchIcon}
-                />
+                <View>
+                    <TextInput
+                        style={[Fonts.regular, styles.input]}
+                        placeholder="Search..."
+                        value={search}
+                        onChangeText={setSearch}
+                        autoCorrect={false}
+                        autoCapitalize="none"
+                        returnKeyType="search"
+                    />
+                    <Image
+                        source={require("../assets/Images/search.png")}
+                        style={styles.searchIcon}
+                    />
+                </View>
                 <View style={styles.headerIcons}>
                     <TouchableOpacity
                         activeOpacity={0.8}
@@ -92,52 +116,64 @@ const HomeScreen = ({ navigation }) => {
                             style={{ height: 28, width: 28 }}
                         />
                     </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={0.8}>
-                        <Image
-                            source={require("../assets/Images/chat.png")}
-                            style={{ height: 28, width: 28 }}
-                        />
-                    </TouchableOpacity>
                 </View>
             </View>
 
-            <Text style={[Fonts.header, { alignSelf: "center" }]}>
+            <Text
+                style={[
+                    Fonts.header,
+                    { alignSelf: "center", marginBottom: 10 },
+                ]}
+            >
                 MOTOXELERATE
             </Text>
 
-            <SafeAreaView style={{ flex: 1 }}>
-                <View
-                    style={{
-                        marginHorizontal: 15,
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: 13,
-                    }}
-                >
-                    <FlatList
-                        data={products}
-                        keyExtractor={(item) => item.id.toString()}
-                        renderItem={({ item }) => (
-                            <ProductCard
-                                product={item}
-                                onPress={() =>
-                                    navigation.navigate("Products", {
-                                        product: { ...item, _id: item.id },
-                                    })
-                                }
-                            />
-                        )}
-                        numColumns={2}
-                        columnWrapperStyle={{
-                            justifyContent: "space-between",
-                            marginBottom: 4,
-                        }}
-                        showsVerticalScrollIndicator={false}
+            {/* ✅ FlatList below search bar */}
+            <FlatList
+                data={filteredProducts}
+                keyExtractor={(item, index) =>
+                    item?.id?.toString() || `fallback-${index}`
+                }
+                renderItem={({ item }) =>
+                    item ? (
+                        <ProductCard
+                            product={item}
+                            onPress={() =>
+                                navigation.navigate("Products", {
+                                    product: { ...item, _id: item.id },
+                                })
+                            }
+                        />
+                    ) : null
+                }
+                numColumns={2}
+                columnWrapperStyle={{
+                    justifyContent: "space-between",
+                    marginHorizontal: 15,
+                    marginBottom: 4,
+                }}
+                contentContainerStyle={{ paddingBottom: 20 }}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
                     />
-                </View>
-            </SafeAreaView>
+                }
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+                    <Text
+                        style={{
+                            textAlign: "center",
+                            marginTop: 40,
+                            fontSize: 16,
+                            color: "#888",
+                        }}
+                    >
+                        No products found.
+                    </Text>
+                }
+                keyboardShouldPersistTaps="handled"
+            />
         </SafeAreaView>
     );
 };

@@ -72,18 +72,14 @@ export const deleteCart = async (cartId) => {
 };
 
 // Remove specific product from cart
-export const removeItemFromCart = async ({ cartId, productId }) => {
+export const removeItemFromCart = async ({ cartId, itemId }) => {
     try {
-        const url = `${CART_URL}/${cartId}/remove`;
-        console.log(`🧪 Calling: ${url} with productId: ${productId}`);
-        const res = await axios.put(url, { productId });
-        console.log("🗑 Removed item from cart:", res.data);
-        return res.data;
+        const response = await axios.put(`${CART_URL}/${cartId}/remove`, {
+            itemId,
+        });
+        return response.data; // ✅ must return updated cart
     } catch (err) {
-        console.error(
-            "❌ Failed to remove item:",
-            err.response?.data || err.message
-        );
+        console.error("❌ API error in removeItemFromCart:", err.message);
         throw err;
     }
 };

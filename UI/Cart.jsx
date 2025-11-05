@@ -39,7 +39,7 @@ const Cart = ({ navigation }) => {
                             specification,
                             category,
                             stock,
-                        } = product || {};
+                        } = item.product || {};
 
                         if (!_id || !productName || price === undefined) {
                             console.warn(
@@ -58,7 +58,8 @@ const Cart = ({ navigation }) => {
                         }
 
                         const mappedItem = {
-                            _id,
+                            _id: item._id, // ✅ cart item ID
+                            productId: product._id,
                             name: productName,
                             price,
                             specification: specification || "",
@@ -92,35 +93,84 @@ const Cart = ({ navigation }) => {
         }
     };
 
-    const handleRemove = async (_id) => {
+    const handleRemove = async (cartItemId) => {
         try {
-            if (!cartId || !_id) {
+            if (!cartId || !cartItemId) {
                 console.warn(
-                    "⚠️ Missing cartId or product _id. Cannot proceed with removal."
+                    "⚠️ Missing cartId or cartItemId. Cannot proceed with removal."
                 );
                 return;
             }
 
             const url = `https://api-motoxelerate.onrender.com/api/cart/${cartId}/remove`;
-            console.log(`🧪 Calling: ${url} with product: ${_id}`);
+            console.log(`🧪 Calling: ${url} with itemId: ${cartItemId}`);
 
-            const res = await removeItemFromCart({ cartId, product: _id });
+            const res = await removeItemFromCart({
+                cartId,
+                itemId: cartItemId,
+            });
 
-            if (!res || res.status !== "success") {
+            if (!res || !Array.isArray(res.items)) {
                 console.warn(
                     "⚠️ Unexpected response from removeItemFromCart:",
                     res
                 );
+                return;
             }
 
-            setCartItems((prevItems) =>
-                prevItems.filter((item) => item._id !== _id)
-            );
+            // ✅ Map updated items and update state
+            const updatedItems = res.items
+                .map((item, index) => {
+                    const {
+                        _id,
+                        productName,
+                        price,
+                        image,
+                        specification,
+                        category,
+                        stock,
+                        quantity,
+                    } = item;
+
+                    if (!_id || !productName || price === undefined) {
+                        console.warn(
+                            `⚠️ Incomplete product data at index ${index}:`,
+                            item
+                        );
+                        return null;
+                    }
+
+                    const hasImage =
+                        typeof image === "string" && image.trim() !== "";
+                    if (!hasImage) {
+                        console.log(
+                            `🖼️ Using fallback image for product: ${productName}`
+                        );
+                    }
+
+                    return {
+                        _id,
+                        name: productName,
+                        price,
+                        specification: specification || "",
+                        category: category || "",
+                        quantity: quantity || 1,
+                        stock: stock || 0,
+                        image: hasImage ? { uri: image } : fallbackImage,
+                        rate: "4.5",
+                        review: "12",
+                    };
+                })
+                .filter(Boolean);
+
+            setCartItems(updatedItems);
             setSelectedProducts((prevSelected) =>
-                prevSelected.filter((item) => item._id !== _id)
+                prevSelected.filter((item) => item._id !== cartItemId)
             );
 
-            console.log(`🗑️ Removed product ${_id} from cart and selection.`);
+            console.log(
+                `✅ Cart state updated with ${updatedItems.length} items after removal.`
+            );
         } catch (err) {
             const message =
                 err?.response?.data?.message ||
@@ -151,34 +201,26 @@ const Cart = ({ navigation }) => {
     );
 
     const toggleSelectItem = (product) => {
-        console.log("Selected product:", product);
+        console.log("🧩 Toggling selection for product:", product);
 
-        const alreadySelected = selectedProducts.find(
-            (p) => p._id === product._id
-        );
+        const isSelected = selectedProducts.some((p) => p._id === product._id);
 
-        if (alreadySelected) {
-            // ✅ Deselect by filtering it out
-            setSelectedProducts((prev) => [
-                ...prev,
-                {
-                    ...product,
-                    quantity: safeQty,
-                    product: product._id, // ✅ used for backend payload
-                },
-            ]);
+        if (isSelected) {
+            // ✅ Deselect by removing from selectedProducts
+            setSelectedProducts((prev) =>
+                prev.filter((p) => p._id !== product._id)
+            );
+            console.log("❎ Deselected:", product.name);
         } else {
             const initialQty = product.quantity || 1;
             const stock = typeof product.stock === "number" ? product.stock : 0;
 
-            // Defensive log
             if (stock <= 0) {
                 console.warn(`⚠️ Product "${product.name}" has zero stock.`);
             }
 
             const safeQty = Math.min(initialQty, stock);
 
-            // Only show alert if stock is positive and initialQty exceeds it
             if (stock > 0 && initialQty > stock) {
                 Alert.alert(
                     "Stock Limit Reached",
@@ -196,6 +238,7 @@ const Cart = ({ navigation }) => {
                     productId: product.productId || product._id,
                 },
             ]);
+            console.log("✅ Selected:", product.name);
         }
     };
 

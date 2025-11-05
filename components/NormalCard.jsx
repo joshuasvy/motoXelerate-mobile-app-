@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     productImage: {
         width: 140,
         height: 150,
-        resizeMode: "cover",
+        resizeMode: "contain",
         borderRadius: 10,
     },
     infoWrapper: {

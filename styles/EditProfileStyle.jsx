@@ -51,6 +51,19 @@ const styles = StyleSheet.create({
         resizeMode: "contain",
         marginBottom: 5,
     },
+    logoutWrapper: {
+        flex: 1,
+        flexDirection: "row",
+        alignItems: "flex-end",
+        justifyContent: "center",
+        marginBottom: 40,
+    },
+    logoutBtn: {
+        backgroundColor: Colors.secondary,
+        paddingVertical: 10,
+        paddingHorizontal: 45,
+        borderRadius: 13,
+    },
 });
 
 export default styles;

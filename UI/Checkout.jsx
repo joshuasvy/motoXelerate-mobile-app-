@@ -34,7 +34,7 @@ export default function Checkout({ navigation }) {
         const rawPrice = item.price ?? 0;
         const price =
             typeof rawPrice === "string"
-                ? parseFloat(rawPrice.replace(/[^\d.]/g, "") || "0")
+                ? parseFloat(String(rawPrice).replace(/[^\d.]/g, "") || "0")
                 : Number(rawPrice);
         return sum + price * (item.quantity || 1);
     }, 0);
@@ -45,18 +45,24 @@ export default function Checkout({ navigation }) {
                 if (!item.productId && !item._id) {
                     console.warn("⚠️ Missing product reference in item:", item);
                 }
+
                 return {
                     product: item.productId || item._id,
                     quantity: item.quantity || 1,
+                    status: "For approval", // ✅ matches backend enum
                 };
             });
 
             const payload = {
                 userId,
+                customerName:
+                    `${user?.firstName} ${user?.lastName}` ||
+                    "Unknown Customer", // ✅ required
                 selectedItems,
                 totalOrder,
                 paymentMethod,
                 notes,
+                orderRequest: "For Approval", // ✅ matches backend enum
             };
 
             console.log("📦 Checkout payload:", payload);
@@ -70,7 +76,18 @@ export default function Checkout({ navigation }) {
                 }
             );
 
-            const data = await response.json();
+            const rawText = await response.text();
+            console.log("🧾 Raw response text:", rawText);
+
+            let data;
+            try {
+                data = JSON.parse(rawText);
+            } catch (err) {
+                console.error("❌ Failed to parse JSON:", err);
+                throw new Error("Server returned invalid response");
+            }
+
+            console.log("📦 Checkout response:", data);
 
             if (response.ok) {
                 Alert.alert(
@@ -180,10 +197,25 @@ export default function Checkout({ navigation }) {
                             Sub Total
                         </Text>
                         {selectedProducts.map((item) => {
-                            const price = parseFloat(
-                                item.price?.replace(/[^\d.]/g, "") || "0"
-                            );
+                            // ✅ Defensive log if price is missing
+                            if (item.price === undefined) {
+                                console.warn("⚠️ Missing price in item:", item);
+                            }
+
+                            // ✅ Safe price parsing
+                            const rawPrice = item.price ?? 0;
+                            const price =
+                                typeof rawPrice === "string"
+                                    ? parseFloat(
+                                          String(rawPrice).replace(
+                                              /[^\d.]/g,
+                                              ""
+                                          ) || "0"
+                                      )
+                                    : Number(rawPrice);
+
                             const subtotal = price * (item.quantity || 1);
+
                             return (
                                 <Text
                                     key={item._id}

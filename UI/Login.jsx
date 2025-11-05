@@ -21,48 +21,78 @@ const Login = ({ navigation }) => {
 
     const login = async (email, password) => {
         console.log("📡 Sending login request to:", LOGIN_URL);
-        const response = await axios.post(LOGIN_URL, { email, password });
-        console.log("📡 Full Axios response:", response);
-        return response.data;
+        console.log("📨 Payload:", {
+            email: email.trim().toLowerCase(),
+            password: password.trim(),
+        });
+
+        try {
+            const response = await axios.post(
+                LOGIN_URL,
+                {
+                    email: email.trim().toLowerCase(),
+                    password: password.trim(),
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    validateStatus: () => true,
+                }
+            );
+
+            console.log("📡 Full Axios response:", {
+                status: response.status,
+                data: response.data,
+            });
+
+            if (response.status !== 200) {
+                console.warn("⚠️ Login rejected:", response.data?.message);
+                return null;
+            }
+
+            return response.data;
+        } catch (err) {
+            console.error("❌ Axios login error:", err.message);
+            return null;
+        }
     };
 
     const handleLogin = async () => {
         console.log("📥 Attempting login with:", { email, password });
 
-        try {
-            const res = await login(email, password);
-            console.log("🧪 Login response:", res);
+        const res = await login(email, password);
 
-            const { token, user } = res;
-
-            if (!token || !user) {
-                console.log("❌ Missing token or user in response:", res);
-                throw new Error("Invalid login response from server.");
-            }
-
-            await AsyncStorage.setItem("token", token);
-            await AsyncStorage.setItem("user", JSON.stringify(user));
-            setUser(user);
-
-            console.log("🔐 Token saved:", token);
-            console.log("👤 User saved:", user);
-
-            if (rememberMe) {
-                await AsyncStorage.setItem("userEmail", email);
-                await AsyncStorage.setItem("userPassword", password);
-            } else {
-                await AsyncStorage.removeItem("userEmail");
-                await AsyncStorage.removeItem("userPassword");
-            }
-
-            navigation.navigate("Tab");
-            Alert.alert("✅ Login Successful", `Welcome, ${user.name}`);
-        } catch (err) {
-            console.error("❌ Full login error:", err);
-            const errorMsg =
-                err?.response?.data?.message || err.message || "Login failed";
-            Alert.alert("Error", errorMsg);
+        if (!res) {
+            Alert.alert("Login Error", "Invalid credentials or server error.");
+            return;
         }
+
+        const { token, user } = res;
+
+        if (!token || !user) {
+            console.warn("❌ Missing token or user in response:", res);
+            Alert.alert("Login Error", "Invalid login response from server.");
+            return;
+        }
+
+        await AsyncStorage.setItem("token", token);
+        await AsyncStorage.setItem("user", JSON.stringify(user));
+        setUser(user);
+
+        console.log("🔐 Token saved:", token);
+        console.log("👤 User saved:", user);
+
+        if (rememberMe) {
+            await AsyncStorage.setItem("userEmail", email);
+            await AsyncStorage.setItem("userPassword", password);
+        } else {
+            await AsyncStorage.removeItem("userEmail");
+            await AsyncStorage.removeItem("userPassword");
+        }
+
+        navigation.navigate("Tab");
+        Alert.alert("✅ Login Successful", `Welcome, ${user.name}`);
     };
 
     useEffect(() => {

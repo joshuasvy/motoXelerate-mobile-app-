@@ -30,7 +30,7 @@ const ProductCard = ({ product, onPress }) => {
                         }}
                     >
                         <Text
-                            style={[Fonts.regular, styles.name]}
+                            style={[Fonts.subtext, styles.name]}
                             numberOfLines={2}
                             ellipsizeMode="tail"
                         >
@@ -47,9 +47,16 @@ const ProductCard = ({ product, onPress }) => {
                     </View>
 
                     <View style={{ position: "absolute", top: 50, left: 10 }}>
-                        <Text style={[Fonts.semibold, styles.price]}>
-                            ₱ {product.price}
+                        <Text style={[Fonts.regular, styles.price]}>
+                            ₱{" "}
+                            {typeof product.price === "string"
+                                ? parseFloat(
+                                      product.price.replace(/[^\d.]/g, "") ||
+                                          "0"
+                                  ).toLocaleString()
+                                : product.price.toLocaleString()}
                         </Text>
+
                         <View style={styles.ratingRow}>
                             <Image
                                 source={require("../assets/Images/star.png")}
