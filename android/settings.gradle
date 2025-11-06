@@ -31,7 +31,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
 }
 expoAutolinking.useExpoModules()
 
-rootProject.name = 'motoXelerate-mobile-app'
+rootProject.name = 'CAPSTONE_PROJECT'
 
 expoAutolinking.useExpoVersionCatalog()
 

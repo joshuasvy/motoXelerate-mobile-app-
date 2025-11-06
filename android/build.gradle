@@ -4,7 +4,7 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath("com.android.tools.build:gradle")
+    classpath("com.android.tools.build:gradle:8.1.1") // ✅ specify version
     classpath("com.facebook.react:react-native-gradle-plugin")
     classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10")
   }
@@ -13,13 +13,20 @@ buildscript {
 allprojects {
   repositories {
     maven {
-      // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
       url(new File(rootDir, "node_modules/react-native/android"))
     }
-
     google()
     mavenCentral()
     maven { url 'https://www.jitpack.io' }
+  }
+}
+
+// ✅ Add Java toolchain for EAS (Java 17)
+gradle.projectsEvaluated {
+  tasks.withType(JavaCompile) {
+    javaCompiler = javaToolchains.compilerFor {
+      languageVersion = JavaLanguageVersion.of(17)
+    }
   }
 }
 

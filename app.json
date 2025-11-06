@@ -28,6 +28,11 @@
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "143c9738-9294-4d5b-9409-7b6bc1002f24"
+      }
+    }
   }
 }
