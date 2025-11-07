@@ -27,7 +27,7 @@ const StackNavigator = () => {
         <AuthProvider>
             <NavigationContainer>
                 <Stack.Navigator
-                    initialRouteName="Login"
+                    initialRouteName="Landing"
                     screenOptions={{ headerShown: false, animation: "default" }}
                 >
                     <Stack.Screen name="Landing" component={LandingScreen} />

@@ -24,7 +24,7 @@ const Profile = ({ navigation }) => {
     const statusOptions = [
         "For Approval",
         "To ship",
-        "Shipped",
+        "Ship",
         "Delivered",
         "Completed",
     ];
@@ -32,7 +32,7 @@ const Profile = ({ navigation }) => {
     const statusMap = {
         "For Approval": "for approval",
         "To ship": "to ship",
-        Shipped: "shipped",
+        Ship: "ship",
         Delivered: "delivered",
         Completed: "completed",
     };
