@@ -18,7 +18,7 @@ import CheckoutButton from "../components/CheckoutButton";
 import ProductCheckoutCard from "../components/ProductCheckoutCard";
 import Fonts from "../constants/Fonts";
 import Colors from "../constants/Colors";
-import { useState, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/authContext";
 
 export default function Checkout({ navigation }) {
@@ -39,8 +39,9 @@ export default function Checkout({ navigation }) {
         return sum + price * (item.quantity || 1);
     }, 0);
 
-    const handleOrderCheckout = async () => {
+    const handleCheckout = async () => {
         try {
+            // Step 1: Prepare selected items
             const selectedItems = selectedProducts.map((item) => {
                 if (!item.productId && !item._id) {
                     console.warn("⚠️ Missing product reference in item:", item);
@@ -49,88 +50,162 @@ export default function Checkout({ navigation }) {
                 return {
                     product: item.productId || item._id,
                     quantity: item.quantity || 1,
-                    status: "For approval", // ✅ matches backend enum
+                    status: "For approval",
                 };
             });
 
-            const payload = {
+            // Step 2: Create GCash charge
+            const createCharge = async () => {
+                const res = await fetch(
+                    "https://api-motoxelerate.onrender.com/api/gcash",
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ amount: totalOrder, userId }),
+                    }
+                );
+
+                const text = await res.text();
+                console.log("🧾 Raw GCash response:", text);
+
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (err) {
+                    console.error("❌ Failed to parse GCash JSON:", err);
+                    throw new Error("Invalid GCash response format");
+                }
+
+                if (data.error) {
+                    console.warn("⚠️ GCash error:", data.error);
+                    throw new Error("GCash payment failed");
+                }
+
+                const { reference_id, charge_id, paid_amount, checkout_url } =
+                    data;
+
+                if (!reference_id || !charge_id || !checkout_url) {
+                    console.warn("⚠️ Missing fields in GCash response:", data);
+                    throw new Error("Missing GCash payment info");
+                }
+
+                return { reference_id, charge_id, paid_amount, checkout_url };
+            };
+
+            const { reference_id, charge_id, paid_amount, checkout_url } =
+                await createCharge();
+
+            // Step 3: Create order with embedded payment info
+            const orderPayload = {
                 userId,
                 customerName:
                     `${user?.firstName} ${user?.lastName}` ||
-                    "Unknown Customer", // ✅ required
+                    "Unknown Customer",
                 selectedItems,
                 totalOrder,
-                paymentMethod,
+                paymentMethod: "Gcash",
                 notes,
-                orderRequest: "For Approval", // ✅ matches backend enum
+                orderRequest: "For Approval",
+                referenceId: reference_id,
+                chargeId: charge_id,
+                paidAmount: paid_amount || totalOrder,
+                deliveryAddress: user?.address || "No address provided",
             };
 
-            console.log("📦 Checkout payload:", payload);
+            console.log("📦 Final order payload:", orderPayload);
 
-            const response = await fetch(
+            const orderRes = await fetch(
                 "https://api-motoxelerate.onrender.com/api/order",
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload),
+                    body: JSON.stringify(orderPayload),
                 }
             );
 
-            const rawText = await response.text();
-            console.log("🧾 Raw response text:", rawText);
+            const orderText = await orderRes.text();
+            console.log("🧾 Raw order response:", orderText);
 
-            let data;
+            let orderData;
             try {
-                data = JSON.parse(rawText);
+                orderData = JSON.parse(orderText);
             } catch (err) {
-                console.error("❌ Failed to parse JSON:", err);
-                throw new Error("Server returned invalid response");
+                console.error("❌ Failed to parse order JSON:", err);
+                throw new Error("Invalid order response format");
             }
 
-            console.log("📦 Checkout response:", data);
+            if (!orderRes.ok) {
+                console.warn("⚠️ Order creation failed:", orderData.error);
+                throw new Error(orderData.error || "Order creation failed");
+            }
 
-            if (response.ok) {
+            console.log("✅ Order created:", orderData._id);
+
+            // Step 4: Redirect to GCash checkout
+            Linking.openURL(checkout_url);
+
+            // Step 5: Poll backend for payment status
+            const pollInterval = setInterval(async () => {
+                try {
+                    const res = await fetch(
+                        `https://api-motoxelerate.onrender.com/api/order/reference/${reference_id}`
+                    );
+
+                    const order = await res.json();
+
+                    const status = order?.payment?.status;
+                    console.log("🔄 Polling payment status:", status);
+
+                    if (status?.toUpperCase() === "SUCCEEDED") {
+                        clearInterval(pollInterval);
+                        clearTimeout(timeout);
+                        Alert.alert("✅ Payment successful!");
+                        navigation.navigate("Tab", { screen: "Home" });
+                    }
+                } catch (err) {
+                    console.warn("⚠️ Polling error:", err.message);
+                }
+            }, 3000);
+
+            const timeout = setTimeout(() => {
+                clearInterval(pollInterval);
                 Alert.alert(
-                    "Order Placed",
-                    "Your order has been successfully submitted."
+                    "⚠️ Payment timeout",
+                    "We couldn't confirm your payment. Please try again."
+                );
+            }, 120000);
+        } catch (error) {
+            console.error("❌ Checkout Error:", error);
+            Alert.alert("Error", error.message || "Checkout failed.");
+        }
+    };
+
+    useEffect(() => {
+        const handleDeepLink = ({ url }) => {
+            if (url === "myapp://gcash-success") {
+                Alert.alert(
+                    "✅ Payment Successful",
+                    `You paid ₱${totalOrder}. Thank you!`
                 );
                 navigation.navigate("Tab", { screen: "Home" });
-            } else {
-                throw new Error(data.error || "Order failed");
+            } else if (url === "myapp://gcash-failure") {
+                Alert.alert(
+                    "❌ Payment Failed",
+                    "Your payment was not completed."
+                );
             }
-        } catch (error) {
-            console.error("❌ Order Checkout Error:", error);
-            Alert.alert("Error", error.message || "Failed to place order.");
-        }
-    };
+        };
 
-    const handleGcashCheckout = async () => {
-        try {
-            const response = await fetch(
-                "https://api-motoxelerate.onrender.com/api/gcash",
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        amount: totalOrder,
-                        userId,
-                    }),
-                }
-            );
+        const subscription = Linking.addEventListener("url", handleDeepLink);
 
-            const data = await response.json();
-            const redirectUrl = data.actions?.mobile_web_checkout_url;
+        Linking.getInitialURL().then((url) => {
+            if (url) handleDeepLink({ url });
+        });
 
-            if (redirectUrl) {
-                Linking.openURL(redirectUrl);
-            } else {
-                Alert.alert("Error", "No redirect URL received.");
-            }
-        } catch (error) {
-            console.error("❌ GCash Checkout Error:", error);
-            Alert.alert("Error", "Failed to initiate GCash payment.");
-        }
-    };
+        return () => {
+            subscription.remove();
+        };
+    }, []);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -179,7 +254,6 @@ export default function Checkout({ navigation }) {
                 <View style={{ marginBottom: 45, marginTop: 20 }}>
                     <PaymentMethod
                         nextIcon={require("../assets/Images/next.png")}
-                        onPress={handleGcashCheckout}
                         contact={user?.contact || "No contact provided"}
                     />
                 </View>
@@ -237,7 +311,7 @@ export default function Checkout({ navigation }) {
                     <CheckoutButton
                         total={totalOrder}
                         selectedProducts={selectedProducts}
-                        onBuy={handleOrderCheckout}
+                        onBuy={handleCheckout}
                     />
                 </View>
             </View>
