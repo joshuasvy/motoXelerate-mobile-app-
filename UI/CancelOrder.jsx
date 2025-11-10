@@ -42,7 +42,15 @@ const CancelOrder = ({ navigation }) => {
 
             <BreakLine />
             <PaymentMethod contact={user?.contact || "No contact provided"} />
-            <CancelCheckoutBtn />
+            <View
+                style={{
+                    flex: 1,
+                    justifyContent: "flex-end",
+                    marginBottom: 20,
+                }}
+            >
+                <CancelCheckoutBtn />
+            </View>
         </SafeAreaView>
     );
 };

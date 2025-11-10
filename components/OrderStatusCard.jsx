@@ -209,7 +209,7 @@ export default function OrderStatusCard({ userId, onPress, statusFilter }) {
                                     onPress={() => onPress(item)}
                                 >
                                     <Image
-                                        source={require("../assets/Images/next.png")}
+                                        source={require("../assets/Images/icons/next.png")}
                                         style={styles.nextIcon}
                                     />
                                 </TouchableOpacity>

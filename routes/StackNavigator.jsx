@@ -13,6 +13,7 @@ import CancelOrder from "../UI/CancelOrder";
 import OrderStatus from "../UI/OrderStatus";
 import StatusDetails from "../UI/StatusDetails";
 import WriteaReview from "../UI/WriteaReview";
+import Reviews from "../UI/Reviews";
 import ChangePassword from "../UI/ChangePassword";
 import OrderStatusDetail from "../UI/OrderStatusDetail";
 import ServiceDetailsScreen from "../UI/ServiceDetailsScreen";
@@ -27,7 +28,7 @@ const StackNavigator = () => {
         <AuthProvider>
             <NavigationContainer>
                 <Stack.Navigator
-                    initialRouteName="Landing"
+                    initialRouteName="Login"
                     screenOptions={{ headerShown: false, animation: "default" }}
                 >
                     <Stack.Screen name="Landing" component={LandingScreen} />
@@ -55,6 +56,7 @@ const StackNavigator = () => {
                         name="WriteaReview"
                         component={WriteaReview}
                     />
+                    <Stack.Screen name="Reviews" component={Reviews} />
                     <Stack.Screen
                         name="ChangePassword"
                         component={ChangePassword}

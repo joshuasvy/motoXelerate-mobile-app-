@@ -59,11 +59,13 @@ const ProductCard = ({ product, onPress }) => {
 
                         <View style={styles.ratingRow}>
                             <Image
-                                source={require("../assets/Images/star.png")}
+                                source={require("../assets/Images/icons/starFill.png")}
                                 style={styles.star}
                             />
                             <Text style={styles.reviewText}>
-                                {product.rate} {`(${product.review} reviews)`}
+                                {product.rate
+                                    ? `${product.rate} (${product.review} reviews)`
+                                    : "No reviews yet"}
                             </Text>
                         </View>
                     </View>

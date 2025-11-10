@@ -5,6 +5,7 @@ import {
     Image,
     TouchableOpacity,
     ScrollView,
+    Alert,
     RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -188,12 +189,25 @@ const Profile = ({ navigation }) => {
                 <OrderStatusCard
                     userId={userData.id}
                     statusFilter={statusMap[selectedStatus]}
-                    onPress={(item) =>
-                        navigation.navigate("CancelOrder", {
-                            item,
-                            address: userData?.address || "No address provided",
-                        })
-                    }
+                    onPress={(item) => {
+                        const status = item?.status?.toLowerCase();
+
+                        if (
+                            ["for approval", "to ship", "ship"].includes(status)
+                        ) {
+                            navigation.navigate("CancelOrder", {
+                                item,
+                                address:
+                                    userData?.address || "No address provided",
+                            });
+                        } else if (status === "completed") {
+                            console.log("🧭 Navigating with item:", item);
+                            navigation.navigate("StatusDetails", { item });
+                        } else {
+                            console.warn("Unhandled status:", status);
+                            Alert.alert("Unknown status", `Status: ${status}`);
+                        }
+                    }}
                 />
             ) : (
                 <Text

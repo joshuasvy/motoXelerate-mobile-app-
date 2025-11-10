@@ -7,7 +7,18 @@ export default function NormalCard({ display, name, specification }) {
         <View style={styles.notifWrapper}>
             <Image source={display} style={styles.productImage} />
             <View style={styles.infoWrapper}>
-                <Text style={[Fonts.semibold, { fontSize: 16, marginTop: 10 }]}>
+                <Text
+                    numberOfLines={2}
+                    style={[
+                        Fonts.semibold,
+                        {
+                            width: 220,
+                            fontSize: 16,
+                            marginTop: 10,
+                            truncate: "tail",
+                        },
+                    ]}
+                >
                     {name}
                 </Text>
                 <View

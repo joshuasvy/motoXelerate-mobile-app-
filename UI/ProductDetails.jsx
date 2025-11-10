@@ -1,4 +1,3 @@
-import React, { useState, useContext } from "react";
 import {
     View,
     Text,
@@ -7,8 +6,10 @@ import {
     Image,
     ScrollView,
     Alert,
+    RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useState, useEffect, useContext } from "react";
 import styles from "../styles/ProductStyle";
 import Colors from "../constants/Colors";
 import Fonts from "../constants/Fonts";
@@ -17,6 +18,9 @@ import CustomModal from "../components/CustomModal";
 import { useRoute } from "@react-navigation/native";
 import { AuthContext } from "../context/authContext";
 import { addToCart } from "../api/cartHooks";
+import axios from "axios";
+import ReviewCard from "../components/ReviewCard";
+import BreakLine from "../components/BreakLine";
 
 const ProductDetails = ({ navigation }) => {
     const { user } = useContext(AuthContext);
@@ -24,6 +28,10 @@ const ProductDetails = ({ navigation }) => {
     const { product } = route.params || {};
     const [cartModal, setCartModal] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [reviews, setReviews] = useState([]);
+    const [averageRating, setAverageRating] = useState(0);
+    const [loadingReviews, setLoadingReviews] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
     if (!product) {
         return (
@@ -32,6 +40,29 @@ const ProductDetails = ({ navigation }) => {
             </View>
         );
     }
+
+    const fetchReviews = async () => {
+        try {
+            console.log("🔍 Fetching reviews for:", product._id);
+            const res = await axios.get(
+                `https://api-motoxelerate.onrender.com/api/review/product/${product._id}`
+            );
+            console.log("✅ Reviews fetched:", res.data);
+            setReviews(res.data);
+
+            const total = res.data.reduce((sum, r) => sum + r.rate, 0);
+            const avg = res.data.length ? total / res.data.length : 0;
+            setAverageRating(avg.toFixed(1));
+        } catch (err) {
+            console.error("❌ Failed to fetch reviews:", err.message);
+        } finally {
+            setLoadingReviews(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchReviews();
+    }, [product._id]);
 
     const handleCart = async () => {
         console.log("🧪 Debug: user._id =", user?._id);
@@ -78,11 +109,24 @@ const ProductDetails = ({ navigation }) => {
         }
     };
 
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        await fetchReviews(); // reuse your existing fetch logic
+        setRefreshing(false);
+    };
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background }}>
             <ScrollView
                 style={styles.container}
                 showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={handleRefresh}
+                    />
+                }
+                contentContainerStyle={{ flexGrow: 1 }}
             >
                 <StatusBar
                     barStyle={"light-content"}
@@ -97,8 +141,8 @@ const ProductDetails = ({ navigation }) => {
                             style={styles.backBtn}
                         >
                             <Image
-                                source={require("../assets/Images/back.png")}
-                                style={{ width: 38, height: 38 }}
+                                source={require("../assets/Images/icons/back.png")}
+                                style={styles.backIcon}
                             />
                         </TouchableOpacity>
                         <TouchableOpacity
@@ -106,100 +150,64 @@ const ProductDetails = ({ navigation }) => {
                             onPress={() => console.log("Notification Clicked")}
                         >
                             <Image
-                                source={require("../assets/Images/notif.png")}
-                                style={{ width: 26, height: 26 }}
+                                source={require("../assets/Images/icons/notif.png")}
+                                style={styles.notifIcon}
                             />
                         </TouchableOpacity>
                     </View>
                 </View>
 
                 <View style={{ padding: 15 }}>
-                    <Text
-                        numberOfLines={2}
-                        style={[Fonts.title, { fontSize: 21 }]}
-                    >
-                        {product.name}
-                    </Text>
-
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            marginTop: 6,
-                        }}
-                    >
-                        <Image
-                            source={require("../assets/Images/star.png")}
-                            style={{ width: 15, height: 15, marginRight: 5 }}
-                        />
-                        <Text
-                            style={[
-                                Fonts.minitext,
-                                { fontSize: 11, color: "#797979" },
-                            ]}
-                        >
-                            {product.rate} ({product.review} reviews)
+                    <View style={styles.nameWrapper}>
+                        <Text numberOfLines={2} style={styles.productName}>
+                            {product.name}
                         </Text>
-                    </View>
-
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            marginTop: 10,
-                        }}
-                    >
-                        <Text style={[Fonts.semibold, { fontSize: 20 }]}>
-                            ₱ {product.price}
-                        </Text>
-                        <Text
-                            style={[
-                                Fonts.minitext,
-                                { fontSize: 11, color: "#797979" },
-                            ]}
-                        >
+                        <Text style={styles.stocks}>
                             Stocks: {product.stock}
                         </Text>
                     </View>
 
-                    <Text
-                        style={[Fonts.subtext, { fontSize: 17, marginTop: 15 }]}
-                    >
-                        Specification
+                    <View style={styles.rateWrapper}>
+                        <Image
+                            source={require("../assets/Images/icons/starFill.png")}
+                            style={styles.starIcon}
+                        />
+                        <Text style={styles.rate}>
+                            {averageRating} ({reviews.length} reviews)
+                        </Text>
+                    </View>
+                    <Text style={styles.price}>₱ {product.price}</Text>
+                    <Text style={styles.specsWrapper}>Specification</Text>
+                    <Text style={styles.specification}>
+                        {product.specification?.trim() ||
+                            "No specification provided."}
                     </Text>
-                    <Text style={[Fonts.regular, { marginTop: 10 }]}>
-                        {product.specification}
-                    </Text>
+                    <BreakLine />
 
-                    <Text
-                        style={[Fonts.subtext, { fontSize: 17, marginTop: 25 }]}
-                    >
-                        Reviews
-                    </Text>
-                    {[1, 2].map((_, index) => (
-                        <View key={index} style={styles.cardWrapper}>
-                            <Image
-                                source={require("../assets/Images/resume-pic.png")}
-                                style={styles.imageWrap}
-                            />
-                            <View style={{ flex: 1, marginLeft: 10 }}>
-                                <Text
-                                    style={[Fonts.semibold, { fontSize: 13 }]}
-                                >
-                                    John Doe
-                                </Text>
-                                <Text
-                                    style={[
-                                        Fonts.regular,
-                                        { fontSize: 12, marginTop: 5 },
-                                    ]}
-                                >
-                                    Lorem ipsum dolor sit amet, consectetur
-                                    adipiscing elit.
-                                </Text>
-                            </View>
-                        </View>
-                    ))}
+                    <View style={styles.viewReviews}>
+                        <Text style={styles.review}>Reviews</Text>
+                        {reviews.length > 3 && (
+                            <TouchableOpacity
+                                activeOpacity={0.8}
+                                onPress={() =>
+                                    navigation.navigate("Reviews", {
+                                        productId: product._id,
+                                    })
+                                }
+                                style={styles.viewbtnWrapper}
+                            >
+                                <Text style={styles.viewAll}>View all</Text>
+                                <Image
+                                    source={require("../assets/Images/icons/next.png")}
+                                    style={styles.nextIcon}
+                                />
+                            </TouchableOpacity>
+                        )}
+                    </View>
+
+                    <View style={{ marginTop: 10 }}>
+                        <ReviewCard reviews={reviews.slice(0, 3)} />
+                    </View>
                 </View>
             </ScrollView>
 

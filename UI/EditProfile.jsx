@@ -261,7 +261,7 @@ const EditProfile = ({ navigation }) => {
                         onPress={() => navigation.navigate("ChangePassword")}
                     >
                         <Image
-                            source={require("../assets/Images/next.png")}
+                            source={require("../assets/Images/icons/next.png")}
                             style={styles.nextIcon}
                         />
                     </TouchableOpacity>
