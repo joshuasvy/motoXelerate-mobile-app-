@@ -111,8 +111,12 @@ const Login = ({ navigation }) => {
     }, []);
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
+        <SafeAreaView style={styles.container} edges={["top"]}>
+            <StatusBar
+                translucent
+                backgroundColor="transparent"
+                barStyle="dark-content"
+            />
             <OutsideHeader
                 name={"Sign up"}
                 onPress={() => navigation.navigate("Signup")}

@@ -12,12 +12,31 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "../styles/HomeStyle";
 import Fonts from "../constants/Fonts";
 import ProductCard from "../components/ProductCard";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useContext, useCallback, useMemo } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import DropDownPicker from "react-native-dropdown-picker";
 import axios from "axios";
+import { NotificationContext } from "../context/notificationContext";
 import fallbackImage from "../assets/Images/product/fallbackImage.png";
 
 const HomeScreen = ({ navigation }) => {
+    const { unreadCount, fetchUnreadCount } = useContext(NotificationContext);
     const [search, setSearch] = useState("");
+
+    // Category dropdown state
+    const [catOpen, setCatOpen] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState("all");
+    const [categories, setCategories] = useState([
+        { label: "All Categories", value: "all" },
+    ]);
+
+    // Price dropdown state
+    const [priceOpen, setPriceOpen] = useState(false);
+    const [selectedPriceRange, setSelectedPriceRange] = useState("all");
+    const [priceRanges, setPriceRanges] = useState([
+        { label: "All Prices", value: "all" },
+    ]);
+
     const [products, setProducts] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
 
@@ -30,7 +49,6 @@ const HomeScreen = ({ navigation }) => {
                 ),
             ]);
 
-            // 🔒 Defensive check for product response format
             if (!Array.isArray(productRes.data)) {
                 console.warn("⚠️ Unexpected product response format");
                 return;
@@ -48,7 +66,6 @@ const HomeScreen = ({ navigation }) => {
                 .map((p) => {
                     if (!p._id || !p.productName || p.price === undefined)
                         return null;
-
                     const stats = statsMap[p._id] || { average: 0, count: 0 };
 
                     return {
@@ -65,11 +82,6 @@ const HomeScreen = ({ navigation }) => {
                 })
                 .filter(Boolean);
 
-            // ✅ Log final product count
-            console.log(
-                `✅ Mapped ${mapped.length} products with review stats`
-            );
-
             setProducts(mapped);
         } catch (err) {
             console.error("❌ Error fetching products or stats:", err.message);
@@ -79,6 +91,12 @@ const HomeScreen = ({ navigation }) => {
     useEffect(() => {
         fetchProducts();
     }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            fetchUnreadCount();
+        }, [fetchUnreadCount])
+    );
 
     const onRefresh = async () => {
         setRefreshing(true);
@@ -91,21 +109,58 @@ const HomeScreen = ({ navigation }) => {
         }
     };
 
+    // Build dynamic categories
+    useEffect(() => {
+        const uniqueCats = [...new Set(products.map((p) => p.category))];
+        setCategories([
+            { label: "All Categories", value: "all" },
+            ...uniqueCats.map((cat) => ({ label: cat, value: cat })),
+        ]);
+    }, [products]);
+
+    // Build dynamic price ranges
+    useEffect(() => {
+        if (products.length > 0) {
+            const prices = products.map((p) => p.price);
+            const maxPrice = Math.max(...prices);
+            const step = 500;
+            const ranges = [];
+
+            for (let start = 0; start <= maxPrice; start += step) {
+                const end = start + step;
+                ranges.push({
+                    label: `₱${start} - ₱${end}`,
+                    value: `${start}-${end}`,
+                });
+            }
+
+            setPriceRanges([{ label: "All Prices", value: "all" }, ...ranges]);
+        }
+    }, [products]);
+
+    // Filter products by search, category, and price
     const filteredProducts = useMemo(() => {
         const query = search.toLowerCase().trim();
-        if (!query) return products;
 
-        return products.filter((product) => {
-            const name = product.name?.toLowerCase() || "";
-            const spec = product.specification?.toLowerCase() || "";
-            const category = product.category?.toLowerCase() || "";
-            return (
-                name.includes(query) ||
-                spec.includes(query) ||
-                category.includes(query)
-            );
+        return products.filter((p) => {
+            const matchesSearch =
+                !query ||
+                p.name?.toLowerCase().includes(query) ||
+                p.specification?.toLowerCase().includes(query) ||
+                p.category?.toLowerCase().includes(query);
+
+            const matchesCategory =
+                selectedCategory === "all" || p.category === selectedCategory;
+
+            let matchesPrice = true;
+            if (selectedPriceRange !== "all") {
+                const [min, max] = selectedPriceRange.split("-").map(Number);
+                matchesPrice = p.price >= min && p.price <= max;
+            }
+
+            return matchesSearch && matchesCategory && matchesPrice;
         });
-    }, [search, products]);
+    }, [search, products, selectedCategory, selectedPriceRange]);
 
     return (
         <FlatList
@@ -134,16 +189,30 @@ const HomeScreen = ({ navigation }) => {
             contentContainerStyle={{
                 paddingBottom: 20,
                 backgroundColor: "#ffffff",
+                zIndex: 0,
             }}
             refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
+            ListHeaderComponentStyle={{ zIndex: 1000, elevation: 1000 }}
             ListHeaderComponent={
-                <>
+                <SafeAreaView
+                    edges={["top"]}
+                    style={{ backgroundColor: "#fff" }}
+                >
+                    <StatusBar
+                        translucent
+                        backgroundColor="transparent"
+                        barStyle="dark-content"
+                    />
+
                     <View style={styles.header}>
-                        <View style={styles.logo} />
+                        <Image
+                            source={require("../assets/Images/logo/motoxelerate.png")}
+                            style={styles.logo}
+                        />
                         <View>
                             <TextInput
                                 style={[Fonts.regular, styles.input]}
@@ -166,23 +235,75 @@ const HomeScreen = ({ navigation }) => {
                                     navigation.navigate("Notification")
                                 }
                             >
-                                <Image
-                                    source={require("../assets/Images/icons/notif.png")}
-                                    style={{ height: 28, width: 28 }}
-                                />
+                                <View style={{ position: "relative" }}>
+                                    <Image
+                                        source={require("../assets/Images/icons/notification.png")}
+                                        style={{
+                                            height: 35,
+                                            width: 35,
+                                            transform: [{ rotate: "20deg" }],
+                                        }}
+                                    />
+                                    {typeof unreadCount === "number" &&
+                                        unreadCount > 0 && (
+                                            <View style={styles.badge}>
+                                                <Text style={styles.badgeText}>
+                                                    {unreadCount}
+                                                </Text>
+                                            </View>
+                                        )}
+                                </View>
                             </TouchableOpacity>
                         </View>
                     </View>
 
-                    <Text
-                        style={[
-                            Fonts.header,
-                            { alignSelf: "center", marginBottom: 10 },
-                        ]}
-                    >
-                        MOTOXELERATE
-                    </Text>
-                </>
+                    {/* Category and Price Range Dropdown */}
+                    <View style={styles.categoryWrapper}>
+                        <View style={styles.categoryDropdown}>
+                            <DropDownPicker
+                                open={catOpen}
+                                value={selectedCategory}
+                                items={categories}
+                                setOpen={setCatOpen}
+                                setValue={setSelectedCategory}
+                                setItems={setCategories}
+                                placeholder="Select category"
+                                style={{
+                                    backgroundColor: "#fffefeff",
+                                    borderRadius: 8,
+                                    borderColor: "#e0e0e0ff",
+                                }}
+                                dropDownContainerStyle={{
+                                    borderColor: "#e0e0e0ff",
+                                    zIndex: 2000,
+                                    elevation: 2000,
+                                }}
+                            />
+                        </View>
+
+                        <View style={styles.priceDropdown}>
+                            <DropDownPicker
+                                open={priceOpen}
+                                value={selectedPriceRange}
+                                items={priceRanges}
+                                setOpen={setPriceOpen}
+                                setValue={setSelectedPriceRange}
+                                setItems={setPriceRanges}
+                                placeholder="Select price range"
+                                style={{
+                                    backgroundColor: "#fffefeff",
+                                    borderRadius: 8,
+                                    borderColor: "#e0e0e0ff",
+                                }}
+                                dropDownContainerStyle={{
+                                    borderColor: "#e0e0e0ff",
+                                    zIndex: 1000,
+                                    elevation: 1000,
+                                }}
+                            />
+                        </View>
+                    </View>
+                </SafeAreaView>
             }
             ListEmptyComponent={
                 <Text

@@ -118,6 +118,11 @@ const styles = StyleSheet.create({
         padding: 18,
         marginBottom: 10,
     },
+    recommendedProdText: {
+        fontFamily: Fonts.title.fontFamily,
+        fontSize: 18,
+        marginBottom: 10,
+    },
 });
 
 export default styles;

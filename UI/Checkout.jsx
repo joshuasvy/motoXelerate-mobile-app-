@@ -37,6 +37,8 @@ export default function Checkout({ navigation }) {
         return sum + price * (item.quantity || 1);
     }, 0);
 
+
+
     const handleCheckout = async () => {
         let orderData = null; // declare once
 

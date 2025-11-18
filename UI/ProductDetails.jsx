@@ -21,6 +21,7 @@ import { addToCart } from "../api/cartHooks";
 import axios from "axios";
 import ReviewCard from "../components/ReviewCard";
 import BreakLine from "../components/BreakLine";
+import RecommendedProdCard from "../components/RecommendedProdCard"; // ✅ import card
 
 const ProductDetails = ({ navigation }) => {
     const { user } = useContext(AuthContext);
@@ -33,6 +34,9 @@ const ProductDetails = ({ navigation }) => {
     const [loadingReviews, setLoadingReviews] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
 
+    // ✅ Recommended products state
+    const [recommended, setRecommended] = useState([]);
+
     if (!product) {
         return (
             <View style={{ padding: 20 }}>
@@ -43,11 +47,9 @@ const ProductDetails = ({ navigation }) => {
 
     const fetchReviews = async () => {
         try {
-            console.log("🔍 Fetching reviews for:", product._id);
             const res = await axios.get(
                 `https://api-motoxelerate.onrender.com/api/review/product/${product._id}`
             );
-            console.log("✅ Reviews fetched:", res.data);
             setReviews(res.data);
 
             const total = res.data.reduce((sum, r) => sum + r.rate, 0);
@@ -60,14 +62,92 @@ const ProductDetails = ({ navigation }) => {
         }
     };
 
+    // ✅ Fetch recommended products by category
+    const fetchRecommended = async () => {
+        try {
+            const res = await axios.get(
+                "https://api-motoxelerate.onrender.com/api/product"
+            );
+
+            if (Array.isArray(res.data)) {
+                const filtered = res.data
+                    .filter(
+                        (p) =>
+                            p.category === product.category &&
+                            p._id !== product._id
+                    )
+                    .slice(0, 6);
+
+                // 🔧 Fetch reviews for each product
+                const enriched = await Promise.all(
+                    filtered.map(async (p) => {
+                        try {
+                            const reviewRes = await axios.get(
+                                `https://api-motoxelerate.onrender.com/api/review/product/${p._id}`
+                            );
+                            const reviews = reviewRes.data || [];
+                            const total = reviews.reduce(
+                                (sum, r) => sum + r.rate,
+                                0
+                            );
+                            const avg = reviews.length
+                                ? total / reviews.length
+                                : 0;
+
+                            return {
+                                id: p._id,
+                                name: p.productName || "Unnamed Product",
+                                image: p.image
+                                    ? { uri: p.image }
+                                    : require("../assets/Images/product/fallbackImage.png"),
+                                price: p.price ?? "N/A",
+                                stock: p.stock?.toString() || "0",
+                                category: p.category || "Uncategorized",
+                                specification: p.specification || "",
+                                rate: avg.toFixed(1),
+                                review: reviews.length,
+                            };
+                        } catch (err) {
+                            console.error(
+                                `❌ Failed to fetch reviews for ${p._id}`,
+                                err.message
+                            );
+                            return {
+                                id: p._id,
+                                name: p.productName || "Unnamed Product",
+                                image: p.image
+                                    ? { uri: p.image }
+                                    : require("../assets/Images/product/fallbackImage.png"),
+                                price: p.price ?? "N/A",
+                                stock: p.stock?.toString() || "0",
+                                category: p.category || "Uncategorized",
+                                specification: p.specification || "",
+                                rate: 0,
+                                review: 0,
+                            };
+                        }
+                    })
+                );
+
+                setRecommended(enriched);
+                console.log(
+                    `✅ Recommended products enriched: ${enriched.length}`
+                );
+            }
+        } catch (err) {
+            console.error(
+                "❌ Error fetching recommended products:",
+                err.message
+            );
+        }
+    };
+
     useEffect(() => {
         fetchReviews();
-    }, [product._id]);
+        fetchRecommended();
+    }, [product._id, product.category]);
 
     const handleCart = async () => {
-        console.log("🧪 Debug: user._id =", user?._id);
-        console.log("🧪 Debug: product._id =", product?._id);
-
         if (!user?._id || !product?._id) {
             Alert.alert("Missing user or product information.");
             return;
@@ -75,18 +155,13 @@ const ProductDetails = ({ navigation }) => {
 
         try {
             setLoading(true);
-
             await addToCart({
                 userId: user._id,
                 product: product._id,
             });
-
             setCartModal(true);
         } catch (err) {
-            console.error(
-                "❌ Failed to add to cart:",
-                err.response?.data || err.message
-            );
+            console.error("❌ Failed to add to cart:", err.message);
             Alert.alert("Error", "Could not add item to cart.");
         } finally {
             setLoading(false);
@@ -101,17 +176,15 @@ const ProductDetails = ({ navigation }) => {
             });
             navigation.navigate("Tab", { screen: "Cart" });
         } catch (err) {
-            console.error(
-                "❌ Failed to buy now:",
-                err.response?.data || err.message
-            );
+            console.error("❌ Failed to buy now:", err.message);
             Alert.alert("Error", "Could not proceed to checkout.");
         }
     };
 
     const handleRefresh = async () => {
         setRefreshing(true);
-        await fetchReviews(); // reuse your existing fetch logic
+        await fetchReviews();
+        await fetchRecommended();
         setRefreshing(false);
     };
 
@@ -208,6 +281,45 @@ const ProductDetails = ({ navigation }) => {
                     <View style={{ marginTop: 10 }}>
                         <ReviewCard reviews={reviews.slice(0, 3)} />
                     </View>
+
+                    {/* ✅ Recommended Products Section */}
+                    {recommended.length > 0 && (
+                        <View style={{ marginTop: 20 }}>
+                            <Text
+                                style={[
+                                    Fonts.title,
+                                    { fontSize: 17, marginBottom: 20 },
+                                ]}
+                            >
+                                Recommended Products
+                            </Text>
+                            <ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={{
+                                    paddingHorizontal: 10,
+                                    gap: 9,
+                                }}
+                            >
+                                {recommended.map((item, index) => (
+                                    <TouchableOpacity
+                                        key={item.id || `rec-${index}`}
+                                        activeOpacity={1}
+                                        onPress={() =>
+                                            navigation.push("Products", {
+                                                product: {
+                                                    ...item,
+                                                    _id: item.id,
+                                                }, // ✅ pass product details
+                                            })
+                                        }
+                                    >
+                                        <RecommendedProdCard product={item} />
+                                    </TouchableOpacity>
+                                ))}
+                            </ScrollView>
+                        </View>
+                    )}
                 </View>
             </ScrollView>
 

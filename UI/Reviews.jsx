@@ -7,7 +7,9 @@ import {
     Image,
     ActivityIndicator,
     RefreshControl,
+    TouchableOpacity,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Fonts from "../constants/Fonts";
@@ -55,67 +57,80 @@ const Reviews = ({ navigation, route }) => {
     };
 
     return (
-        <ScrollView
-            refreshControl={
-                <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={handleRefresh}
-                />
-            }
-            contentContainerStyle={{ flexGrow: 1 }}
-            style={styles.container}
-        >
-            <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
-            <DefaultHeader
-                title={"Reviews"}
-                backIcon={require("../assets/Images/icons/back.png")}
-                back={"Back"}
-                goBack={() => navigation.goBack()}
+        <SafeAreaView style={styles.safeContainer} edges={["top"]}>
+            <StatusBar
+                translucent
+                backgroundColor="transparent"
+                barStyle="dark-content"
             />
 
-            <View style={{ paddingHorizontal: 15 }}>
-                <Text style={styles.customer}>Customer Reviews</Text>
+            <ScrollView
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={handleRefresh}
+                    />
+                }
+                contentContainerStyle={{ flexGrow: 1 }}
+                style={styles.container}
+            >
+                <DefaultHeader
+                    title={"Reviews"}
+                    backIcon={require("../assets/Images/icons/back.png")}
+                    back={"Back"}
+                    goBack={() => navigation.goBack()}
+                />
+                <View style={{ paddingHorizontal: 15 }}>
+                    <Text style={styles.customer}>Customer Reviews</Text>
 
-                <View style={styles.rateWrapper}>
-                    <View style={styles.starWrapper}>
-                        {Array.from({ length: 5 }, (_, i) => {
-                            const filled = i + 1 <= Math.floor(average);
-                            const half =
-                                i + 1 === Math.ceil(average) &&
-                                average % 1 >= 0.5;
-                            return (
-                                <Image
-                                    key={i}
-                                    source={
-                                        filled
-                                            ? require("../assets/Images/icons/starFill.png")
-                                            : half
-                                            ? require("../assets/Images/icons/starHalf.png")
-                                            : require("../assets/Images/icons/starOutline.png")
-                                    }
-                                    style={styles.starIcon}
-                                />
-                            );
-                        })}
+                    <View style={styles.rateWrapper}>
+                        <View style={styles.starWrapper}>
+                            {Array.from({ length: 5 }, (_, i) => {
+                                const filled = i + 1 <= Math.floor(average);
+                                const half =
+                                    i + 1 === Math.ceil(average) &&
+                                    average % 1 >= 0.5;
+                                return (
+                                    <Image
+                                        key={i}
+                                        source={
+                                            filled
+                                                ? require("../assets/Images/icons/starFill.png")
+                                                : half
+                                                ? require("../assets/Images/icons/starHalf.png")
+                                                : require("../assets/Images/icons/starOutline.png")
+                                        }
+                                        style={styles.starIcon}
+                                    />
+                                );
+                            })}
+                        </View>
+                        <Text style={styles.rate}>
+                            {average} ({reviews.length} Reviews)
+                        </Text>
                     </View>
-                    <Text style={styles.rate}>
-                        {average} ({reviews.length} Reviews)
-                    </Text>
-                </View>
 
-                {loading ? (
-                    <ActivityIndicator size="large" color={Colors.primary} />
-                ) : (
-                    <ReviewCard reviews={reviews} />
-                )}
-            </View>
-        </ScrollView>
+                    {loading ? (
+                        <ActivityIndicator
+                            size="large"
+                            color={Colors.primary}
+                        />
+                    ) : (
+                        <ReviewCard reviews={reviews} />
+                    )}
+                </View>
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 
 export default Reviews;
 
 const styles = StyleSheet.create({
+    safeContainer: {
+        flex: 1,
+        backgroundColor: "#fff",
+    },
     container: {
         flex: 1,
         backgroundColor: "#fff",
@@ -155,8 +170,8 @@ const styles = StyleSheet.create({
         position: "relative",
     },
     imageWrap: {
-        width: 95,
-        height: 95,
+        width: 80,
+        height: 80,
         borderRadius: 50,
         justifyContent: "center",
         alignItems: "center",

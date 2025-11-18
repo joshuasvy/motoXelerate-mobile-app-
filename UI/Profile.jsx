@@ -82,10 +82,7 @@ const Profile = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar barStyle={"light-content"} backgroundColor={"#fff"} />
-            <DefaultHeader
-                title={"Profile"}
-                onPress={() => navigation.navigate("Notification")}
-            />
+            <DefaultHeader title={"Profile"} />
 
             <View style={styles.profileContainer}>
                 <Image

@@ -1,36 +1,48 @@
 {
-    "expo": {
-        "name": "motoXelerate-mobile-app",
-        "slug": "motoXelerate-mobile-app",
-        "version": "1.0.0",
-        "orientation": "portrait",
-        "icon": "./assets/icon.png",
-        "userInterfaceStyle": "light",
-        "newArchEnabled": true,
-        "splash": {
-            "image": "./assets/splash-icon.png",
-            "resizeMode": "contain",
-            "backgroundColor": "#ffffff"
-        },
-        "ios": {
-            "supportsTablet": true
-        },
-        "android": {
-            "adaptiveIcon": {
-                "foregroundImage": "./assets/adaptive-icon.png",
-                "backgroundColor": "#ffffff"
-            },
-            //   "edgeToEdgeEnabled": true,
-            "package": "com.joshuasvy.motoXeleratemobileapp"
-        },
-        "web": {
-            "favicon": "./assets/favicon.png"
-        },
-        "plugins": ["expo-font"],
-        "extra": {
-            "eas": {
-                "projectId": "143c9738-9294-4d5b-9409-7b6bc1002f24"
-            }
-        }
+  "expo": {
+    "name": "MotoXelerate",
+    "slug": "motoXelerate-mobile-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/Images/logo/motoxelerate-icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/Images/logo/motoxelerate-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff",
+      "borderRadius": 60
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.joshuasvy.motoXeleratemobileapp",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.joshuasvy.motoXeleratemobileapp"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "143c9738-9294-4d5b-9409-7b6bc1002f24"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/143c9738-9294-4d5b-9409-7b6bc1002f24"
     }
+  }
 }

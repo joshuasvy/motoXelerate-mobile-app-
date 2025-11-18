@@ -97,8 +97,15 @@ const Signup = ({ navigation }) => {
     };
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-            <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+        <SafeAreaView
+            style={{ flex: 1, backgroundColor: "#fff" }}
+            edges={["top"]}
+        >
+            <StatusBar
+                translucent
+                backgroundColor="transparent"
+                barStyle="dark-content"
+            />
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={{ flex: 1 }}

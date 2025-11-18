@@ -1,5 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
+import { NotificationProvider } from "../context/notificationContext";
 import { AuthProvider } from "../context/authContext";
 import LandingScreen from "../UI/LandingScreen";
 import Login from "../UI/Login";
@@ -7,7 +9,6 @@ import Signup from "../UI/Signup";
 import Notification from "../UI/Notification";
 import ProductDetails from "../UI/ProductDetails";
 import TabNavigator from "./TabNavigator";
-import AppointmentDetails from "../UI/AppointmentDetails";
 import EditProfile from "../UI/EditProfile";
 import CancelOrder from "../UI/CancelOrder";
 import OrderStatus from "../UI/OrderStatus";
@@ -25,58 +26,79 @@ const Stack = createNativeStackNavigator();
 
 const StackNavigator = () => {
     return (
-        <AuthProvider>
-            <NavigationContainer>
-                <Stack.Navigator
-                    initialRouteName="Login"
-                    screenOptions={{ headerShown: false, animation: "default" }}
-                >
-                    <Stack.Screen name="Landing" component={LandingScreen} />
-                    <Stack.Screen name="Login" component={Login} />
-                    <Stack.Screen name="Signup" component={Signup} />
-                    <Stack.Screen name="Products" component={ProductDetails} />
-                    <Stack.Screen name="Checkout" component={Checkout} />
-                    <Stack.Screen name="Tab" component={TabNavigator} />
-                    <Stack.Screen
-                        name="Notification"
-                        component={Notification}
-                    />
-                    <Stack.Screen
-                        name="AppointmentDetails"
-                        component={AppointmentDetails}
-                    />
-                    <Stack.Screen name="EditProfile" component={EditProfile} />
-                    <Stack.Screen name="CancelOrder" component={CancelOrder} />
-                    <Stack.Screen name="OrderStatus" component={OrderStatus} />
-                    <Stack.Screen
-                        name="StatusDetails"
-                        component={StatusDetails}
-                    />
-                    <Stack.Screen
-                        name="WriteaReview"
-                        component={WriteaReview}
-                    />
-                    <Stack.Screen name="Reviews" component={Reviews} />
-                    <Stack.Screen
-                        name="ChangePassword"
-                        component={ChangePassword}
-                    />
-                    <Stack.Screen
-                        name="OrderStatusDetail"
-                        component={OrderStatusDetail}
-                    />
-                    <Stack.Screen
-                        name="ServiceDetailsScreen"
-                        component={ServiceDetailsScreen}
-                    />
-                    <Stack.Screen
-                        name="AppointmentHistory"
-                        component={AppointmentHistory}
-                    />
-                    {/* <Stack.Screen name="Testing" component={Testing} /> */}
-                </Stack.Navigator>
-            </NavigationContainer>
-        </AuthProvider>
+        <SafeAreaProvider>
+            <AuthProvider>
+                <NotificationProvider>
+                    <NavigationContainer>
+                        <Stack.Navigator
+                            initialRouteName="Login"
+                            screenOptions={{
+                                headerShown: false,
+                                animation: "default",
+                            }}
+                        >
+                            <Stack.Screen
+                                name="Landing"
+                                component={LandingScreen}
+                            />
+                            <Stack.Screen name="Login" component={Login} />
+                            <Stack.Screen name="Signup" component={Signup} />
+                            <Stack.Screen
+                                name="Products"
+                                component={ProductDetails}
+                            />
+                            <Stack.Screen
+                                name="Checkout"
+                                component={Checkout}
+                            />
+                            <Stack.Screen name="Tab" component={TabNavigator} />
+                            <Stack.Screen
+                                name="Notification"
+                                component={Notification}
+                            />
+                            <Stack.Screen
+                                name="EditProfile"
+                                component={EditProfile}
+                            />
+                            <Stack.Screen
+                                name="CancelOrder"
+                                component={CancelOrder}
+                            />
+                            <Stack.Screen
+                                name="OrderStatus"
+                                component={OrderStatus}
+                            />
+                            <Stack.Screen
+                                name="StatusDetails"
+                                component={StatusDetails}
+                            />
+                            <Stack.Screen
+                                name="WriteaReview"
+                                component={WriteaReview}
+                            />
+                            <Stack.Screen name="Reviews" component={Reviews} />
+                            <Stack.Screen
+                                name="ChangePassword"
+                                component={ChangePassword}
+                            />
+                            <Stack.Screen
+                                name="OrderStatusDetail"
+                                component={OrderStatusDetail}
+                            />
+                            <Stack.Screen
+                                name="ServiceDetailsScreen"
+                                component={ServiceDetailsScreen}
+                            />
+                            <Stack.Screen
+                                name="AppointmentHistory"
+                                component={AppointmentHistory}
+                            />
+                            {/* <Stack.Screen name="Testing" component={Testing} /> */}
+                        </Stack.Navigator>
+                    </NavigationContainer>
+                </NotificationProvider>
+            </AuthProvider>
+        </SafeAreaProvider>
     );
 };
 
