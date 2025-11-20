@@ -198,16 +198,8 @@ const HomeScreen = ({ navigation }) => {
             keyboardShouldPersistTaps="handled"
             ListHeaderComponentStyle={{ zIndex: 1000, elevation: 1000 }}
             ListHeaderComponent={
-                <SafeAreaView
-                    edges={["top"]}
-                    style={{ backgroundColor: "#fff" }}
-                >
-                    <StatusBar
-                        translucent
-                        backgroundColor="transparent"
-                        barStyle="dark-content"
-                    />
-
+                <SafeAreaView style={{ backgroundColor: "#fff" }}>
+                    <StatusBar barStyle="dark-content" backgroundColor="#fff" />
                     <View style={styles.header}>
                         <Image
                             source={require("../assets/Images/logo/motoxelerate.png")}

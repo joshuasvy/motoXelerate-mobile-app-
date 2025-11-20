@@ -7,8 +7,7 @@ import Profile from "../UI/Profile";
 import TabIcon from "../constants/TabIcon";
 import TabName from "../constants/TabName";
 import Colors from "../constants/Colors";
-import { View, Text } from "react-native";
-import React from "react";
+import { View } from "react-native";
 
 const Tab = createBottomTabNavigator();
 

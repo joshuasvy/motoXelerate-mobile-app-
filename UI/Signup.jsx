@@ -19,6 +19,13 @@ import colors from "../constants/Colors";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import OutsideHeader from "../components/OutsideHeader";
+import {
+    validateSignUp,
+    validateField,
+    passwordRules,
+    confirmPasswordRules,
+    formatContactNumber,
+} from "../utils/validation";
 
 const API_URL = "https://api-motoxelerate.onrender.com/api/user/register";
 
@@ -30,82 +37,78 @@ const Signup = ({ navigation }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [rePassword, setRePassword] = useState("");
+    const [errors, setErrors] = useState({});
 
-    const lnameRef = useRef(null);
-    const addressRef = useRef(null);
-    const contactRef = useRef(null);
-    const emailRef = useRef(null);
-    const passwordRef = useRef(null);
-    const rePasswordRef = useRef(null);
-    const prevContactRef = useRef("");
-
-    const formatContactNumber = (input) => {
-        let digits = input.replace(/\D/g, "").replace(/^0/, "");
-        if (digits.startsWith("63")) digits = digits.slice(2);
-        const prefix = "+63";
-
-        if (digits.length === 0) return prefix;
-        if (digits.length <= 3) return `${prefix} ${digits}`;
-        if (digits.length <= 6)
-            return `${prefix} ${digits.slice(0, 3)} ${digits.slice(3)}`;
-        return `${prefix} ${digits.slice(0, 3)} ${digits.slice(
-            3,
-            6
-        )} ${digits.slice(6, 11)}`;
+    // refs dictionary for easier focus
+    const inputRefs = {
+        fname: useRef(null),
+        lname: useRef(null),
+        address: useRef(null),
+        contact: useRef(null),
+        email: useRef(null),
+        password: useRef(null),
+        rePassword: useRef(null),
     };
 
+    const prevContactRef = useRef("");
+
     const handleSignup = async () => {
-        if (
-            !fname ||
-            !lname ||
-            !address ||
-            !contact ||
-            !email ||
-            !password ||
-            !rePassword
-        ) {
-            return Alert.alert("Error", "All fields are required.");
+        console.log("🚀 handleSignup triggered");
+
+        const newErrors = validateSignUp(
+            fname,
+            lname,
+            address,
+            contact,
+            email,
+            password,
+            rePassword
+        );
+        console.log("📝 Validation result:", newErrors);
+
+        setErrors(newErrors);
+
+        if (Object.keys(newErrors).length > 0) {
+            const firstErrorKey = Object.keys(newErrors)[0];
+            inputRefs[firstErrorKey]?.current?.focus();
+            return; // stop here if errors exist
         }
 
-        if (password !== rePassword) {
-            return Alert.alert("Error", "Passwords do not match.");
-        }
-
+        // ✅ If no errors, proceed with API call
         const payload = {
             firstName: fname,
             lastName: lname,
             address,
-            contact: contact, // formatted version
+            contact: formatContactNumber(contact),
             email,
             password,
         };
 
         try {
-            console.log("📤 Sending to API:", payload);
+            console.log("📤 Sending payload:", payload);
+
             const response = await axios.post(API_URL, payload);
-            console.log("✅ Response:", response.data);
+
+            console.log("✅ API response:", response.data);
+
             Alert.alert("Success", "Account created!");
             navigation.navigate("Login");
         } catch (err) {
-            console.log("❌ Error:", err.response?.data);
+            console.error("❌ Signup error:", err);
+
             const errorMsg =
                 err?.response?.data?.message ||
                 err?.response?.data?.error ||
+                err.message ||
                 "Something went wrong";
+
             Alert.alert("Error", errorMsg);
         }
     };
 
     return (
-        <SafeAreaView
-            style={{ flex: 1, backgroundColor: "#fff" }}
-            edges={["top"]}
-        >
-            <StatusBar
-                translucent
-                backgroundColor="transparent"
-                barStyle="dark-content"
-            />
+        <SafeAreaView style={styles.container}>
+            <StatusBar barStyle="dark-content" backgroundColor="#fff" />
             <KeyboardAvoidingView
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={{ flex: 1 }}
@@ -135,114 +138,196 @@ const Signup = ({ navigation }) => {
                                 </Text>
 
                                 <Input
-                                    marginTop={10}
-                                    label={"First Name:"}
-                                    placeholder={"Enter your first name"}
+                                    label="First Name:"
+                                    placeholder="Enter your first name"
                                     value={fname}
-                                    onChangeText={setfName}
-                                    inputRef={lnameRef}
+                                    onChangeText={(text) => {
+                                        setfName(text);
+                                        setErrors((prev) => ({
+                                            ...prev,
+                                            fname: validateField(
+                                                "fname",
+                                                text,
+                                                { password }
+                                            ),
+                                        }));
+                                    }}
+                                    inputRef={inputRefs.fname}
                                     returnKeyType="next"
                                     blurOnSubmit={false}
                                     onSubmitEditing={() =>
-                                        lnameRef.current?.focus()
+                                        inputRefs.lname.current?.focus()
                                     }
+                                    error={errors.fname}
                                 />
+
                                 <Input
-                                    marginTop={10}
-                                    label={"Last Name:"}
-                                    placeholder={"Enter your last name"}
+                                    label="Last Name:"
+                                    placeholder="Enter your last name"
                                     value={lname}
-                                    onChangeText={setlName}
-                                    inputRef={addressRef}
+                                    onChangeText={(text) => {
+                                        setlName(text);
+                                        setErrors((prev) => ({
+                                            ...prev,
+                                            lname: validateField(
+                                                "lname",
+                                                text,
+                                                { password }
+                                            ),
+                                        }));
+                                    }}
+                                    inputRef={inputRefs.lname}
                                     returnKeyType="next"
                                     blurOnSubmit={false}
                                     onSubmitEditing={() =>
-                                        addressRef.current?.focus()
+                                        inputRefs.address.current?.focus()
                                     }
+                                    error={errors.lname}
                                 />
+
                                 <Input
-                                    marginTop={10}
-                                    label={"Address:"}
-                                    placeholder={"Enter your address"}
+                                    label="Address:"
+                                    placeholder="Enter your address"
                                     value={address}
-                                    onChangeText={setAddress}
-                                    inputRef={contactRef}
+                                    onChangeText={(text) => {
+                                        setAddress(text);
+                                        setErrors((prev) => ({
+                                            ...prev,
+                                            address: validateField(
+                                                "address",
+                                                text,
+                                                { password }
+                                            ),
+                                        }));
+                                    }}
+                                    inputRef={inputRefs.address}
                                     returnKeyType="next"
                                     blurOnSubmit={false}
                                     onSubmitEditing={() =>
-                                        contactRef.current?.focus()
+                                        inputRefs.contact.current?.focus()
                                     }
+                                    error={errors.address}
                                 />
+
                                 <Input
-                                    marginTop={10}
-                                    label={"Contact:"}
-                                    placeholder={"+63"}
+                                    label="Contact:"
+                                    placeholder="+63"
                                     value={contact}
                                     onChangeText={(t) => {
                                         const prev = prevContactRef.current;
                                         const isDeleting =
                                             t.length < prev.length;
-
-                                        if (isDeleting) {
-                                            setContact(t);
-                                        } else {
-                                            setContact(formatContactNumber(t));
-                                        }
-
+                                        const formatted = isDeleting
+                                            ? t
+                                            : formatContactNumber(t);
+                                        setContact(formatted);
                                         prevContactRef.current = t;
+
+                                        setErrors((prev) => ({
+                                            ...prev,
+                                            contact: validateField(
+                                                "contact",
+                                                formatted,
+                                                { password }
+                                            ),
+                                        }));
                                     }}
-                                    inputRef={emailRef}
+                                    inputRef={inputRefs.contact}
                                     keyboardType="number-pad"
                                     inputMode="numeric"
                                     returnKeyType="next"
                                     blurOnSubmit={false}
                                     onSubmitEditing={() =>
-                                        emailRef.current?.focus()
+                                        inputRefs.email.current?.focus()
                                     }
+                                    error={errors.contact}
                                     leftIcon={
                                         <Image
                                             source={require("../assets/Images/icons/flag.png")}
-                                            style={{ width: 20, height: 20 }}
+                                            style={{
+                                                width: 20,
+                                                height: 20,
+                                                marginLeft: 10,
+                                            }}
                                             resizeMode="contain"
                                         />
                                     }
                                 />
+
                                 <Input
-                                    marginTop={10}
-                                    label={"Email:"}
-                                    placeholder={"Enter your email"}
+                                    label="Email:"
+                                    placeholder="Enter your email"
                                     value={email}
-                                    onChangeText={setEmail}
-                                    inputRef={passwordRef}
+                                    onChangeText={(text) => {
+                                        setEmail(text);
+                                        setErrors((prev) => ({
+                                            ...prev,
+                                            email: validateField(
+                                                "email",
+                                                text,
+                                                { password }
+                                            ),
+                                        }));
+                                    }}
+                                    inputRef={inputRefs.email}
                                     keyboardType="email-address"
                                     returnKeyType="next"
                                     blurOnSubmit={false}
                                     onSubmitEditing={() =>
-                                        passwordRef.current?.focus()
+                                        inputRefs.password.current?.focus()
                                     }
+                                    error={errors.email}
                                 />
+
                                 <Input
-                                    marginTop={10}
-                                    label={"Password:"}
-                                    placeholder={"Enter your password"}
+                                    label="Password:"
+                                    placeholder="Enter your password"
                                     value={password}
-                                    onChangeText={setPassword}
+                                    onChangeText={(text) => {
+                                        setPassword(text);
+                                        setErrors((prev) => ({
+                                            ...prev,
+                                            password: validateField(
+                                                "password",
+                                                text,
+                                                { password }
+                                            ),
+                                        }));
+                                    }}
                                     secureTextEntry={true}
-                                    inputRef={rePasswordRef}
+                                    inputRef={inputRefs.password}
                                     returnKeyType="next"
                                     blurOnSubmit={false}
                                     onSubmitEditing={() =>
-                                        rePasswordRef.current?.focus()
+                                        inputRefs.rePassword.current?.focus()
                                     }
+                                    error={errors.password}
+                                    validationRules={passwordRules}
                                 />
+
                                 <Input
-                                    marginTop={10}
-                                    label={"Confirm Password:"}
-                                    placeholder={"Confirm your password"}
+                                    label="Confirm Password:"
+                                    placeholder="Confirm your password"
                                     value={rePassword}
-                                    onChangeText={setRePassword}
+                                    onChangeText={(text) => {
+                                        setRePassword(text);
+                                        setErrors((prev) => ({
+                                            ...prev,
+                                            rePassword: validateField(
+                                                "rePassword",
+                                                text,
+                                                { password }
+                                            ),
+                                        }));
+                                    }}
                                     secureTextEntry={true}
+                                    inputRef={inputRefs.rePassword}
                                     returnKeyType="done"
+                                    error={errors.rePassword}
+                                    validationRules={confirmPasswordRules(
+                                        password,
+                                        rePassword
+                                    )}
                                 />
                             </View>
 

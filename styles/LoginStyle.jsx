@@ -17,7 +17,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     checkboxWrapper: {
-        marginTop: 13,
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
@@ -30,7 +29,7 @@ const styles = StyleSheet.create({
     footerWrapper: {
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 60,
+        marginTop: 85,
     },
 });
 

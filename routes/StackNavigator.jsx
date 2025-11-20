@@ -20,7 +20,6 @@ import OrderStatusDetail from "../UI/OrderStatusDetail";
 import ServiceDetailsScreen from "../UI/ServiceDetailsScreen";
 import Checkout from "../UI/Checkout";
 import AppointmentHistory from "../UI/AppointmentHistory";
-// import Testing from "../Testing";
 
 const Stack = createNativeStackNavigator();
 
@@ -31,10 +30,10 @@ const StackNavigator = () => {
                 <NotificationProvider>
                     <NavigationContainer>
                         <Stack.Navigator
-                            initialRouteName="Login"
+                            initialRouteName="Landing"
                             screenOptions={{
                                 headerShown: false,
-                                animation: "default",
+                                animation: "none", // 👈 default: no transition
                             }}
                         >
                             <Stack.Screen
@@ -93,7 +92,6 @@ const StackNavigator = () => {
                                 name="AppointmentHistory"
                                 component={AppointmentHistory}
                             />
-                            {/* <Stack.Screen name="Testing" component={Testing} /> */}
                         </Stack.Navigator>
                     </NavigationContainer>
                 </NotificationProvider>

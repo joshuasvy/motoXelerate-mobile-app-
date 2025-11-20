@@ -2,6 +2,7 @@ import { View, Text, StatusBar, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/authContext";
+import { validateLogin, validateField } from "../utils/validation";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import styles from "../styles/LoginStyle";
@@ -15,17 +16,12 @@ const Login = ({ navigation }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [rememberMe, setRememberMe] = useState(false);
+    const [errors, setErrors] = useState({});
 
     const LOGIN_URL = "https://api-motoxelerate.onrender.com/api/user/login";
     const { setUser } = useContext(AuthContext);
 
     const login = async (email, password) => {
-        console.log("📡 Sending login request to:", LOGIN_URL);
-        console.log("📨 Payload:", {
-            email: email.trim().toLowerCase(),
-            password: password.trim(),
-        });
-
         try {
             const response = await axios.post(
                 LOGIN_URL,
@@ -34,26 +30,51 @@ const Login = ({ navigation }) => {
                     password: password.trim(),
                 },
                 {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: { "Content-Type": "application/json" },
                     validateStatus: () => true,
                 }
             );
 
-            console.log("📡 Full Axios response:", {
+            console.log("📡 Login response:", {
                 status: response.status,
+                message: response.data?.message,
                 data: response.data,
             });
 
+            if (response.status === 404) {
+                console.warn("❌ No user found:", email);
+                setErrors((prev) => ({
+                    ...prev,
+                    email: "Email does not exist",
+                }));
+                return null;
+            }
+
+            if (response.status === 401) {
+                console.warn("❌ Incorrect password for:", email);
+                setErrors((prev) => ({
+                    ...prev,
+                    password: "Incorrect password",
+                }));
+                return null;
+            }
+
             if (response.status !== 200) {
-                console.warn("⚠️ Login rejected:", response.data?.message);
+                console.warn("⚠️ Other login error:", response.data?.message);
+                setErrors((prev) => ({
+                    ...prev,
+                    email: response.data?.message || "Login failed",
+                }));
                 return null;
             }
 
             return response.data;
         } catch (err) {
             console.error("❌ Axios login error:", err.message);
+            setErrors((prev) => ({
+                ...prev,
+                email: "Server error. Please try again later.",
+            }));
             return null;
         }
     };
@@ -61,27 +82,52 @@ const Login = ({ navigation }) => {
     const handleLogin = async () => {
         console.log("📥 Attempting login with:", { email, password });
 
-        const res = await login(email, password);
-
-        if (!res) {
-            Alert.alert("Login Error", "Invalid credentials or server error.");
+        // ✅ New combined empty check
+        if (!email && !password) {
+            setErrors({
+                email: "Please enter your email and password",
+            });
+            console.warn("⚠️ Login blocked: missing both email and password");
             return;
         }
+
+        if (!email) {
+            setErrors({
+                email: "Please enter your email",
+            });
+            console.warn("⚠️ Login blocked: missing email");
+            return;
+        }
+
+        if (!password) {
+            setErrors({
+                password: "Please enter your password",
+            });
+            console.warn("⚠️ Login blocked: missing password");
+            return;
+        }
+
+        // client-side validation (only email format now)
+        const newErrors = validateLogin(email, password);
+        setErrors(newErrors);
+        if (Object.keys(newErrors).length > 0) return;
+
+        const res = await login(email, password);
+        if (!res) return;
 
         const { token, user } = res;
-
         if (!token || !user) {
-            console.warn("❌ Missing token or user in response:", res);
-            Alert.alert("Login Error", "Invalid login response from server.");
+            setErrors((prev) => ({
+                ...prev,
+                email: "Invalid login response from server.",
+            }));
             return;
         }
 
+        // ✅ success
         await AsyncStorage.setItem("token", token);
         await AsyncStorage.setItem("user", JSON.stringify(user));
         setUser(user);
-
-        console.log("🔐 Token saved:", token);
-        console.log("👤 User saved:", user);
 
         if (rememberMe) {
             await AsyncStorage.setItem("userEmail", email);
@@ -92,7 +138,6 @@ const Login = ({ navigation }) => {
         }
 
         navigation.navigate("Tab");
-        Alert.alert("✅ Login Successful", `Welcome, ${user.name}`);
     };
 
     useEffect(() => {
@@ -111,12 +156,8 @@ const Login = ({ navigation }) => {
     }, []);
 
     return (
-        <SafeAreaView style={styles.container} edges={["top"]}>
-            <StatusBar
-                translucent
-                backgroundColor="transparent"
-                barStyle="dark-content"
-            />
+        <SafeAreaView style={styles.container}>
+            <StatusBar barStyle="dark-content" backgroundColor="#fff" />
             <OutsideHeader
                 name={"Sign up"}
                 onPress={() => navigation.navigate("Signup")}
@@ -124,18 +165,21 @@ const Login = ({ navigation }) => {
             <View style={styles.wrapper}>
                 <Text style={[Fonts.header, { marginBottom: 20 }]}>Login</Text>
                 <Input
-                    label={"Email:"}
-                    placeholder={"Enter your email"}
+                    label="Email:"
+                    placeholder="Enter your email"
+                    keyboardType="email-address"
                     value={email}
                     onChangeText={setEmail}
+                    error={errors.email}
                 />
+
                 <Input
-                    marginTop={18}
-                    label={"Password:"}
-                    placeholder={"Enter your password"}
+                    label="Password:"
+                    placeholder="Enter your password"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry={true}
+                    error={errors.password}
                 />
 
                 <View style={styles.checkboxWrapper}>
